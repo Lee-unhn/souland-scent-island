@@ -16,3 +16,6 @@ public/assets/souland-prospectus.pdf
 
 # Pages workflow（OAuth 無 workflow scope，改用 gh-pages 分支部署；本機保留供參考）
 .github/
+
+# L3b 文案匯入用 CSV（一次性，匯入後不需進 repo）
+嗅覺島-文案表-匯入Google用.csv

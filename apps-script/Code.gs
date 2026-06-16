@@ -75,6 +75,7 @@ function route_(action, d){
     case 'brandDelete':  return brandDelete_(d);
     case 'layoutGet':    return layoutGet_();
     case 'layoutSave':   return layoutSave_(d);
+    case 'textGet':      return textGet_();
     default:             return json_({ok:true,msg:'SOULAND endpoint alive ✦'});
   }
 }
@@ -237,4 +238,24 @@ function layoutSave_(d){
   if(!d.layout) return json_({ok:false,error:'缺少 layout'});
   SP.setProperty('LAYOUT', JSON.stringify(d.layout));
   return json_({ok:true});
+}
+
+/* ---------- 全站文字覆蓋（L3b）----------
+   「文案」Sheet（Script Property: SHEET_TEXT）：
+     第1欄=頁面提示、第2欄=原文、第3欄=新文字。
+   textGet 公開（前台載入用），只回傳「有填新文字」的原文→新文字對照，
+   前台把頁面上等於『原文』的文字替換成『新文字』；沒填的維持原文。 */
+function textSheet_(){
+  var id = P('SHEET_TEXT'); if(!id) return null;
+  return ssById_(id).getSheets()[0];
+}
+function textGet_(){
+  var sh = textSheet_(); if(!sh) return json_({ok:true,map:{}});
+  var v = sh.getDataRange().getValues(); var map={};
+  for(var i=1;i<v.length;i++){
+    var from = String(v[i][1]||'').trim();
+    var to   = String(v[i][2]||'').trim();
+    if(from && to) map[from] = to;
+  }
+  return json_({ok:true, map:map});
 }
