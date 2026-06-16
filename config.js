@@ -49,14 +49,26 @@ window.SOULAND_CONFIG = {
 window.SOULAND_NET = {
   url(){ return (window.SOULAND_CONFIG || {}).APPS_SCRIPT_URL || ''; },
   live(){ return !!this.url(); },
-  // 統一走 GET（Apps Script 跨來源最穩；資料放 d 參數的 JSON）。doPost/POST 在瀏覽器易被轉址+CORS 卡住。
-  async _call(action, data){
+  // 用 JSONP（<script> 標籤）呼叫 Apps Script：跨所有瀏覽器（含 Safari）皆穩，
+  // 不受 CORS / fetch 轉址限制。資料放 d 參數的 JSON，回應走 callback。
+  _call(action, data){
     const u = this.url();
-    const q = u + (u.indexOf('?')>=0?'&':'?') + 'action=' + encodeURIComponent(action)
-            + (data ? '&d=' + encodeURIComponent(JSON.stringify(data)) : '');
-    const res = await fetch(q, { method:'GET', redirect:'follow' });
-    return res.json();
+    return new Promise((resolve, reject) => {
+      if(!u) return reject(new Error('未設定後端'));
+      const cb = '__sl_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      const q = u + (u.indexOf('?')>=0?'&':'?') + 'action=' + encodeURIComponent(action)
+              + (data ? '&d=' + encodeURIComponent(JSON.stringify(data)) : '')
+              + '&callback=' + cb;
+      const s = document.createElement('script');
+      let done = false;
+      const cleanup = () => { try{ delete window[cb]; }catch(e){ window[cb] = undefined; } if(s.parentNode) s.parentNode.removeChild(s); };
+      window[cb] = (resp) => { done = true; cleanup(); resolve(resp); };
+      s.onerror = () => { if(!done){ cleanup(); reject(new Error('後端載入失敗（網路或部署）')); } };
+      s.src = q;
+      document.head.appendChild(s);
+      setTimeout(() => { if(!done){ cleanup(); reject(new Error('後端回應逾時')); } }, 20000);
+    });
   },
-  async post(action, data){ return this._call(action, data); },
-  async get(action){ return this._call(action, null); }
+  post(action, data){ return this._call(action, data); },
+  get(action){ return this._call(action, null); }
 };
