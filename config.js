@@ -49,16 +49,14 @@ window.SOULAND_CONFIG = {
 window.SOULAND_NET = {
   url(){ return (window.SOULAND_CONFIG || {}).APPS_SCRIPT_URL || ''; },
   live(){ return !!this.url(); },
-  async post(action, data){
+  // 統一走 GET（Apps Script 跨來源最穩；資料放 d 參數的 JSON）。doPost/POST 在瀏覽器易被轉址+CORS 卡住。
+  async _call(action, data){
     const u = this.url();
-    // text/plain = 簡單請求，避開 Apps Script 的 CORS preflight；redirect:follow 才讀得到回應
-    const res = await fetch(u, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
-      body: JSON.stringify(Object.assign({ action }, data||{})), redirect:'follow' });
+    const q = u + (u.indexOf('?')>=0?'&':'?') + 'action=' + encodeURIComponent(action)
+            + (data ? '&d=' + encodeURIComponent(JSON.stringify(data)) : '');
+    const res = await fetch(q, { method:'GET', redirect:'follow' });
     return res.json();
   },
-  async get(action){
-    const u = this.url();
-    const res = await fetch(u + (u.indexOf('?')>=0?'&':'?') + 'action=' + encodeURIComponent(action), { redirect:'follow' });
-    return res.json();
-  }
+  async post(action, data){ return this._call(action, data); },
+  async get(action){ return this._call(action, null); }
 };
