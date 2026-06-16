@@ -3,12 +3,16 @@
   publish = "public"
   command = ""
 
-# 永遠拿最新的 html/js（避免瀏覽器拿到舊版 config 造成「連線錯誤」）
+# 永遠拿最新的 html/js/css（避免瀏覽器拿到舊版造成「連線錯誤」或舊字級/樣式殘留）
 [[headers]]
   for = "/*.html"
   [headers.values]
     Cache-Control = "no-cache"
 [[headers]]
   for = "/*.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+[[headers]]
+  for = "/*.css"
   [headers.values]
     Cache-Control = "no-cache"
