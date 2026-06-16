@@ -70,6 +70,9 @@ function route_(action, d){
     case 'adminRegs':    return doAdminRegs_(d);
     case 'regStatus':    return doRegStatus_(d);
     case 'brandsPublic': return brandsPublic_();
+    case 'brandList':    return brandList_(d);
+    case 'brandSave':    return brandSave_(d);
+    case 'brandDelete':  return brandDelete_(d);
     default:             return json_({ok:true,msg:'SOULAND endpoint alive ✦'});
   }
 }
@@ -151,22 +154,58 @@ function doRegStatus_(d){
   return json_({ok:false,error:'找不到該筆'});
 }
 
-/* ---------- 公開：參展品牌（讀 SHEET_BRANDS）---------- */
-function brandsPublic_(){
-  var id = P('SHEET_BRANDS'); if(!id) return json_({ok:true,brands:[]});
+/* ---------- 參展品牌（SHEET_BRANDS）讀 + 後台增改刪 ----------
+   id = 試算表列號（第 2 列起）。產品推薦欄存 JSON（相容舊的｜分隔）。 */
+var BRAND_HEADERS = ['品牌名稱(中)','品牌英文名','類型','產地','攤位編號','前調','中調','後調','品牌故事','產品推薦','社群連結','公開顯示'];
+
+function brandSheet_(){
+  var id = P('SHEET_BRANDS'); if(!id) return null;
   var sh = ssById_(id).getSheets()[0];
+  if(sh.getLastRow()===0){ sh.appendRow(BRAND_HEADERS); sh.getRange(1,1,1,BRAND_HEADERS.length).setFontWeight('bold'); sh.setFrozenRows(1); }
+  return sh;
+}
+function parseProds_(cell){
+  if(!cell) return [];
+  var s = String(cell).trim();
+  if(s.charAt(0)==='['){ try{ return JSON.parse(s); }catch(e){} }
+  return s.split('｜').filter(function(x){return x.trim();}).map(function(x){ return {name:x.trim(),note:'',desc:''}; });
+}
+function rowToBrand_(H, row, rowNum){
+  function c(n){ var i=H.indexOf(n); return i>=0 ? row[i] : ''; }
+  var pub = String(c('公開顯示')).trim();
+  return { id:String(rowNum), name:c('品牌名稱(中)'), en:c('品牌英文名'), type:c('類型'), country:c('產地'),
+    booth:c('攤位編號'), top:c('前調'), heart:c('中調'), base:c('後調'), story:c('品牌故事'),
+    products:parseProds_(c('產品推薦')), social:c('社群連結'), logo:'',
+    published: !(pub && pub.indexOf('否')>=0) };
+}
+function brandToRow_(b){
+  return [ b.name||'', b.en||'', b.type||'', b.country||'', b.booth||'', b.top||'', b.heart||'', b.base||'',
+    b.story||'', JSON.stringify(b.products||[]), b.social||'', (b.published===false?'否':'是') ];
+}
+function brandsPublic_(){
+  var sh = brandSheet_(); if(!sh) return json_({ok:true,brands:[]});
   var v = sh.getDataRange().getValues(); if(v.length<2) return json_({ok:true,brands:[]});
-  var H = v[0]; var col = function(n){ return H.indexOf(n); };
-  var ci={ name:col('品牌名稱(中)'),en:col('品牌英文名'),type:col('類型'),country:col('產地'),booth:col('攤位編號'),
-    top:col('前調'),heart:col('中調'),base:col('後調'),story:col('品牌故事'),prod:col('產品推薦'),social:col('社群連結'),pub:col('公開顯示') };
-  var out=[];
-  for(var i=1;i<v.length;i++){
-    var row=v[i]; if(!row[ci.name]) continue;
-    if(ci.pub>=0 && String(row[ci.pub]).trim() && String(row[ci.pub]).indexOf('否')>=0) continue;
-    var prods=[]; if(ci.prod>=0 && row[ci.prod]) String(row[ci.prod]).split('｜').forEach(function(p){ if(p.trim()) prods.push({name:p.trim(),note:'',desc:''}); });
-    out.push({ id:'r'+i, name:row[ci.name], en:ci.en>=0?row[ci.en]:'', type:ci.type>=0?row[ci.type]:'', country:ci.country>=0?row[ci.country]:'',
-      booth:ci.booth>=0?row[ci.booth]:'', top:ci.top>=0?row[ci.top]:'', heart:ci.heart>=0?row[ci.heart]:'', base:ci.base>=0?row[ci.base]:'',
-      story:ci.story>=0?row[ci.story]:'', products:prods, social:ci.social>=0?row[ci.social]:'', logo:'' });
-  }
+  var H = v[0]; var out=[];
+  for(var i=1;i<v.length;i++){ if(!v[i][0]) continue; var b=rowToBrand_(H,v[i],i+1); if(b.published) out.push(b); }
   return json_({ok:true,brands:out});
+}
+function brandList_(d){
+  if(!verify_(d.token)) return json_({ok:false,error:'未授權或逾時'});
+  var sh = brandSheet_(); var v = sh.getDataRange().getValues(); var H = v[0]; var out=[];
+  for(var i=1;i<v.length;i++){ if(!v[i][0]) continue; out.push(rowToBrand_(H,v[i],i+1)); }
+  return json_({ok:true,brands:out});
+}
+function brandSave_(d){
+  if(!verify_(d.token)) return json_({ok:false,error:'未授權或逾時'});
+  if(!String(d.name||'').trim()) return json_({ok:false,error:'品牌名稱必填'});
+  var sh = brandSheet_(); var rowArr = brandToRow_(d);
+  if(d.id){ sh.getRange(Number(d.id),1,1,BRAND_HEADERS.length).setValues([rowArr]); }
+  else { sh.appendRow(rowArr); }
+  return json_({ok:true});
+}
+function brandDelete_(d){
+  if(!verify_(d.token)) return json_({ok:false,error:'未授權或逾時'});
+  if(!d.id) return json_({ok:false,error:'缺少 id'});
+  var sh = brandSheet_(); sh.deleteRow(Number(d.id));
+  return json_({ok:true});
 }
