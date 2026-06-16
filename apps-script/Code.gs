@@ -76,6 +76,8 @@ function route_(action, d){
     case 'layoutGet':    return layoutGet_();
     case 'layoutSave':   return layoutSave_(d);
     case 'textGet':      return textGet_();
+    case 'textList':     return textList_(d);
+    case 'textSave':     return textSave_(d);
     default:             return json_({ok:true,msg:'SOULAND endpoint alive ✦'});
   }
 }
@@ -258,4 +260,26 @@ function textGet_(){
     if(from && to) map[from] = to;
   }
   return json_({ok:true, map:map});
+}
+/* 後台用：列出全部文案（含原文+新文字+試算表列號），需 token */
+function textList_(d){
+  if(!verify_(d.token)) return json_({ok:false,error:'未授權或逾時'});
+  var sh = textSheet_(); if(!sh) return json_({ok:false,error:'未設定 SHEET_TEXT'});
+  var v = sh.getDataRange().getValues(); var out=[];
+  for(var i=1;i<v.length;i++){
+    var from = String(v[i][1]||'').trim(); if(!from) continue;
+    out.push({ row:i+1, page:String(v[i][0]||''), from:from, to:String(v[i][2]||'') });
+  }
+  return json_({ok:true, items:out});
+}
+/* 後台用：只寫有變更的列的「新文字」（C 欄），需 token */
+function textSave_(d){
+  if(!verify_(d.token)) return json_({ok:false,error:'未授權或逾時'});
+  var items = (d && d.items) || []; if(!items.length) return json_({ok:true,saved:0});
+  var sh = textSheet_(); if(!sh) return json_({ok:false,error:'未設定 SHEET_TEXT'});
+  for(var i=0;i<items.length;i++){
+    var r = Number(items[i].row);
+    if(r>=2) sh.getRange(r,3).setValue(String(items[i].to||''));
+  }
+  return json_({ok:true, saved:items.length});
 }

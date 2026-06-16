@@ -97,8 +97,9 @@ npm start            # → http://localhost:3000
 後端：`POST /api/admin/login`（回簽章 token，8 小時效期）＋ `GET/POST/PUT/DELETE /api/admin/brands`（Bearer 驗證）＋ 公開 `GET /api/brands`。
 
 **⑤ 全站文字覆蓋（L3b，2026-06-16）**：用一張「文案」Google Sheet（欄位＝頁面／原文／新文字）做「**原文 → 新文字**」對照表。前台 `config.js` 的 `SOULAND_TEXT.apply()` 在頁面載入後讀後端 `textGet`，把畫面上**整段等於「原文」**的文字替換成「新文字」；沒填的維持原文（不影響載入速度，後台 admin 不套用）。
-- 機制：**零標記、全站任何字可改、你直接編 Sheet**；只比對「整段相等」，不會把長句中的字亂代換。暫不替換表單 placeholder 等屬性文字。
-- 後端：`textGet`（公開）讀 Script Property `SHEET_TEXT` 指向的「文案」Sheet，只回有填新文字的對照。
+- 機制：**零標記、全站任何字可改**；只比對「整段相等」，不會把長句中的字亂代換。暫不替換表單 placeholder 等屬性文字。
+- **兩種編輯方式**（同步）：① 後台 `/admin.html`「**文案**」分頁（搜尋原文 → 改「新文字」→ 儲存，只回寫有變更的列）② 直接編 Google「文案」Sheet。
+- 後端：`textGet`（公開，前台讀）／`textList`＋`textSave`（後台，需 token）皆讀 Script Property `SHEET_TEXT` 指向的「文案」Sheet。
 - 建立：把 `嗅覺島-文案表-匯入Google用.csv`（428 段、已 gitignore）匯入成新 Google Sheet → 把 Sheet ID 設成 Apps Script 的 `SHEET_TEXT` 屬性 → 重新部署 Code.gs。
 
 ## 4. 內容來源
