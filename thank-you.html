@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>報名完成｜嗅覺島 SOULAND 2026</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/logo-mark-dark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<section class="ty-hero">
+  <div class="ty-card">
+    <img class="mark" src="assets/logo-lockup-v-dark.png" alt="嗅覺島 SOULAND">
+    <div class="ty-tick">✓</div>
+    <h1>參展申請已送出</h1>
+    <p class="sub">感謝您報名嗅覺島 SOULAND 2026。我們已收到您的申請。</p>
+    <div class="recap" id="recap" style="display:none"></div>
+
+    <div class="ty-actions">
+      <a class="btn btn-primary" id="dlBtn" href="#" download>下載參展簡章 PDF ↓</a>
+      <a class="btn btn-ghost" href="index.html">回到首頁</a>
+    </div>
+
+    <div class="ty-next">
+      <h4>接下來會發生什麼</h4>
+      <div class="ty-step"><b>01</b><div>主辦單位將於 <b style="color:#284664;font-family:inherit">5–7 個工作天</b> 內以 Email 與您聯繫,確認品牌資料與展位。</div></div>
+      <div class="ty-step"><b>02</b><div>審核通過後簽署參展合約,並繳交攤位費 50% 訂金 + 保證金。</div></div>
+      <div class="ty-step"><b>03</b><div>確認展位位置與設計需求,展前一個月繳清尾款,10/28–10/29 進場佈展。</div></div>
+    </div>
+
+    <div class="ty-pay" id="payBox">
+      <b>繳費方式｜報名審核後匯款</b>　審核通過後，主辦單位將以 Email 提供匯款帳號，請依通知完成訂金與保證金匯款。
+    </div>
+    <div id="ecpayMount" style="display:none"></div>
+  </div>
+</section>
+
+<script src="config.js"></script>
+<script>
+(function(){
+  const c=window.SOULAND_CONFIG||{};
+  const qs=new URLSearchParams(location.search);
+  const brand=qs.get('brand'), plan=qs.get('plan'), qty=qs.get('qty');
+  const order=qs.get('order'), pay=parseInt(qs.get('pay'),10)||0;
+  const fmt=n=>'NT$'+n.toLocaleString('en-US');
+
+  // 申請摘要
+  if(brand){
+    const r=document.getElementById('recap');
+    r.style.display='block';
+    r.innerHTML='品牌:<b>'+brand+'</b>'+(plan?'　|　方案:<b>'+plan+(qty?' × '+qty+' 格':'')+'</b>':'')
+      +(order?'　|　報名單號:<b>'+order+'</b>':'');
+  }
+
+  // 簡章下載
+  const dl=document.getElementById('dlBtn');
+  dl.href=c.PROSPECTUS_URL||'assets/souland-prospectus.pdf';
+  if(c.PROSPECTUS_NAME) dl.setAttribute('download', c.PROSPECTUS_NAME);
+
+  const p=c.PAYMENT||{};
+  const box=document.getElementById('payBox');
+  if(p.ENABLED && order && pay>0){
+    // （保留）線上金流：未來把 PAYMENT.ENABLED 改回 true 即啟用
+    const modeTag = p.MODE==='STAGE-TEST' ? '（測試環境・不會真實扣款）' : '';
+    box.innerHTML =
+      '<b>線上繳交訂金 + 保證金</b>　應繳 <b style="color:#284664">'+fmt(pay)+'</b> '+modeTag+
+      '<div style="margin-top:14px"><button class="btn btn-primary" id="payNow">立即線上付款 →</button></div>'+
+      '<div class="paytip" id="payTip" style="margin-top:10px;font-size:.84rem;color:#7a715f"></div>';
+    document.getElementById('payNow').onclick=async function(){
+      const btn=this; btn.disabled=true; btn.textContent='前往綠界…';
+      try{
+        const res=await fetch(p.CREATE_ORDER_ENDPOINT,{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ orderId:order, amount:pay, item:'嗅覺島2026參展 '+(plan||'')+' 訂金保證金', email:'' })
+        });
+        const j=await res.json();
+        if(!res.ok || !j.ok) throw new Error(j.error||'金流建立失敗');
+        const mount=document.getElementById('ecpayMount');
+        mount.innerHTML=j.formHtml;
+        const f=mount.querySelector('form'); if(!f) throw new Error('結帳表單缺失');
+        f.submit();
+      }catch(err){
+        btn.disabled=false; btn.textContent='立即線上付款 →';
+        document.getElementById('payTip').textContent='發生錯誤：'+err.message+'（本機測試請確認後端 server 已啟動）';
+      }
+    };
+  } else {
+    // 線上金流關閉 → 顯示匯款備註（+ 若帶有應繳金額則一併顯示）
+    const note=(c.REMITTANCE&&c.REMITTANCE.NOTE)||'報名審核通過後，主辦單位將以 Email 提供匯款帳號，請依通知完成訂金與保證金匯款。';
+    box.innerHTML='<b>繳費方式｜報名審核後匯款</b>'
+      +(pay>0?'　本次應繳（簽約訂金＋保證金）約 <b style="color:#284664">'+fmt(pay)+'</b>':'')
+      +'<div style="margin-top:10px;font-size:.9rem;line-height:1.9;color:#5a5142">'+note+'</div>';
+  }
+})();
+</script>
+</body>
+</html>

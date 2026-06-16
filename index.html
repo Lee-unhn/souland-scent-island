@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>嗅覺島 SOULAND 2026｜台灣香氛年度氣味展</title>
+<meta name="description" content="嗅覺島 SOULAND 2026 — 台灣第一個香氛產業年度氣味展。2026.10.30–11.01,台北華山1914文創園區四連棟。">
+<link rel="icon" href="assets/logo-mark-dark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <div class="logo" onclick="go('home')">
+      <img src="assets/logo-mark-dark.png" alt="嗅覺島 SOULAND">
+      <span class="lt"><b>嗅覺島</b><span>SOULAND 2026</span></span>
+    </div>
+    <button class="nav-toggle" aria-label="選單" onclick="this.closest('.nav').classList.toggle('open')">☰</button>
+    <div class="nav-links">
+      <button data-nav id="nav-home" class="on" onclick="go('home')">首頁</button>
+      <button data-nav id="nav-about" onclick="go('about')">關於</button>
+      <button data-nav id="nav-visit" onclick="go('visit')">展覽資訊</button>
+      <button data-nav id="nav-experience" onclick="go('experience')">特色體驗</button>
+      <button data-nav id="nav-brands" onclick="go('brands')">參展品牌</button>
+      <button data-nav id="nav-awards" onclick="go('awards')">年度大賞</button>
+      <a class="cta" href="vendor.html">我要參展</a>
+      <button data-ticket data-ticket-label="購票">購票</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HOME ============ -->
+<main class="page show" id="page-home">
+  <header class="hero">
+    <div class="hero-poster" style="background-image:url('assets/poster.jpg')"></div>
+    <div class="hero-canvas"><svg id="contours" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice"></svg></div>
+    <svg class="moon" viewBox="0 0 100 100" aria-hidden="true">
+      <defs><mask id="cr"><rect width="100" height="100" fill="#fff"/><circle cx="62" cy="42" r="40" fill="#000"/></mask></defs>
+      <circle cx="50" cy="50" r="40" fill="#B89A5C" mask="url(#cr)"/>
+    </svg>
+    <div class="hero-in">
+      <span class="eyebrow">TAIWAN'S FIRST ANNUAL FRAGRANCE EXHIBITION</span>
+      <h1>嗅覺島<span class="h1-en">SOULAND · TAIPEI</span></h1>
+      <p class="lead">台灣第一個香氛產業年度氣味展。匯聚台灣、亞洲及歐日 100+ 品牌,在台北華山 1914 文創園區四連棟,展開一場為期三天的嗅覺覺醒之旅。</p>
+      <div class="hero-meta">
+        <div><small>展期 DATE</small><strong>2026.10.30 Fri – 11.01 Sun</strong></div>
+        <div><small>地點 VENUE</small><strong>華山1914文創園區 四連棟 A.B.C.D</strong></div>
+        <div><small>規模 SCALE</small><strong>2,800–3,200 ㎡・100+ 品牌</strong></div>
+      </div>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="vendor.html">我要參展 →</a>
+        <button class="btn btn-ghost" data-ticket data-ticket-label="購票資訊">購票資訊</button>
+      </div>
+      <div class="countdown" aria-label="開幕倒數">
+        <div class="cd"><b id="cd-d">—</b><small>DAYS</small></div><div class="cd-sep">/</div>
+        <div class="cd"><b id="cd-h">—</b><small>HOURS</small></div><div class="cd-sep">/</div>
+        <div class="cd"><b id="cd-m">—</b><small>MINS</small></div><div class="cd-sep">/</div>
+        <div class="cd"><b id="cd-s">—</b><small>SECS</small></div>
+        <div class="cd" style="align-self:center;margin-left:8px"><small style="letter-spacing:.2em">距 10/30 開幕</small></div>
+      </div>
+    </div>
+  </header>
+
+  <section class="stats"><div class="stats-in">
+    <div class="stat"><b>20,000</b><small>觀眾人次(3天)</small></div>
+    <div class="stat"><b>100+</b><small>參展品牌</small></div>
+    <div class="stat"><b>150–200</b><small>B2B 媒合人次</small></div>
+    <div class="stat"><b>30+</b><small>媒體合作夥伴</small></div>
+  </div></section>
+
+  <section class="sec alt"><div class="wrap">
+    <div class="sec-head"><span class="sub-en">Scent Awakening</span><h2>嗅覺五覺醒</h2>
+      <p>五個層次的氣味覺醒認知體驗。觀眾從進場到離場,主動參與每一個互動體驗關卡,透過「氣味護照」記錄個人的嗅覺探索足跡,完成屬於自己的感知覺醒之旅。</p></div>
+    <div class="awaken">
+      <div><small>I</small><h3>感知啟蒙</h3><p>打開嗅覺的第一道門,重新認識「聞」這件事。</p></div>
+      <div><small>II</small><h3>情感連結</h3><p>氣味與情緒相遇,找到屬於自己的感受語言。</p></div>
+      <div><small>III</small><h3>記憶喚醒</h3><p>每一支氣味都是一段時光,喚起被遺忘的場景。</p></div>
+      <div><small>IV</small><h3>品味建構</h3><p>理解香調結構與層次,建立自己的選香判斷。</p></div>
+      <div><small>V</small><h3>自我表達</h3><p>讓氣味成為個人風格的延伸,說出無法言說的自己。</p></div>
+    </div>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <div class="sec-head"><span class="sub-en">Exhibition Highlights</span><h2>特色體驗</h2></div>
+    <div class="cards">
+      <div class="card"><span class="tag">Scent Passport</span><h3>氣味護照</h3><h4>把今天聞到的,帶回家</h4><p>每位觀眾入場領取專屬手冊,走訪品牌攤位時將試香紙依序收入對應頁格,標示品牌名稱與香調說明。聞過什麼、喜歡哪個、想回頭找的是誰——翻開護照一目瞭然。</p></div>
+      <div class="card"><span class="tag">Scent Reset Station</span><h3>嗅覺重置站</h3><h4>咖啡豆,是這座島的中場休息</h4><p>購買有價票入場的觀眾,可兌換一杯裝有烘焙咖啡豆的手持杯。當嗅覺需要清零,深吸一口,讓鼻子回到剛進展場時的狀態,準備好遇見下一個品牌。</p></div>
+      <div class="card"><span class="tag">Scent × Art</span><h3>香氛藝術展區</h3><h4>當一件作品有了氣味</h4><p>調香師深入理解藝術作品背後的創作脈絡,將核心感受轉譯成一支氣味——不是描述作品,而是延伸它。兩種感官指向同一個情感核心。</p></div>
+      <div class="card"><span class="tag">Workshops</span><h3>調香工作坊</h3><h4>親手調出屬於你的氣味</h4><p>展期間舉辦多場調香工作坊,由專業調香師帶領,從香調認識到實際調配,完成一支帶得走的個人香氣。報名資訊將於展前公布。</p></div>
+    </div>
+  </div></section>
+
+  <section class="sec deep"><div class="wrap">
+    <div class="sec-head"><span class="sub-en">Annual Fragrance Awards</span><h2>年度香氛大賞</h2>
+      <p>嗅覺島年度盛事的最高榮譽。透過評審團與觀眾票選,挑選出年度最具代表性的香氛作品與品牌,建立台灣香氛產業的權威榜單。頒獎典禮於 11/1 閉幕日舉行。</p></div>
+    <div class="awards">
+      <div class="award"><small>Seasonal Awards</small><h3>四季香氛獎</h3><p>春之花香青草、夏之海鹽柑橘、秋之木質辛香、冬之琥珀皮革——選出最能代表台灣四季空氣的氣味。</p></div>
+      <div class="award"><small>Annual Rankings</small><h3>年度榜單獎</h3><p>台灣年度 TOP 10 香水、TOP 10 蠟燭,評審評分結合觀眾票選;另設年度最值得收藏香水。</p></div>
+      <div class="award"><small>Brand Awards</small><h3>品牌大獎</h3><p>年度最佳台灣品牌、最佳新興品牌、最佳海外品牌、最佳品牌敘事,得獎標籤可供品牌全年引用。</p></div>
+    </div>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <div class="sec-head"><span class="sub-en">Schedule</span><h2>展期時間表</h2></div>
+    <div class="timeline">
+      <div class="tday"><small>10/30 (五)</small><h3>開幕日</h3><ul><li>媒體 & KOL 優先入場</li><li>公開展覽開始</li><li>B2B 媒合會議 150–200 人次</li><li>開幕酒會 100–150 VIP</li></ul></div>
+      <div class="tday"><small>10/31 (六)</small><h3>主展日</h3><ul><li>公開展覽全日開放</li><li>調香工作坊 320 人次</li><li>品牌交流活動</li><li>沉浸體驗高峰</li></ul></div>
+      <div class="tday"><small>11/01 (日)</small><h3>閉幕日</h3><ul><li>公開展覽最終日</li><li>氣味護照集章截止</li><li>現場抽獎活動</li><li>年度香氛大賞頒獎</li></ul></div>
+    </div>
+  </div></section>
+</main>
+
+<!-- ============ ABOUT ============ -->
+<main class="page" id="page-about">
+  <header class="brands-hero"><div class="wrap">
+    <span class="eyebrow">About SOULAND</span><h1>關於嗅覺島</h1>
+    <p>台灣第一個香氛產業年度氣味展。我們相信氣味不只是商品,而是一種理解自己、表達自己的語言——嗅覺島存在的意義,是把這件事好好說給更多人聽。</p>
+  </div></header>
+  <section class="sec"><div class="wrap">
+    <div class="sec-head"><span class="sub-en">Positioning</span><h2>展覽定位</h2></div>
+    <p style="max-width:760px;font-size:1.05rem;color:#3f4d5d;line-height:2">嗅覺島致力於打造香氛品牌與消費者之間的專業橋樑。匯聚台灣、亞洲及歐日品牌,提供品牌曝光、通路媒合與消費者教育的完整平台,讓獨立品牌被看見、讓喜歡香氣的人找到屬於自己的氣味。我們要做的,是一個每年都值得回來的產業主場。</p>
+  </div></section>
+  <section class="sec alt"><div class="wrap">
+    <div class="sec-head"><span class="sub-en">Curatorial Concept</span><h2>策展理念｜嗅覺五覺醒</h2>
+      <p>整場展覽以五個層次的氣味覺醒為軸線。觀眾從進場到離場,主動參與每一個互動關卡,透過「氣味護照」記錄個人的嗅覺探索足跡,完成屬於自己的感知覺醒之旅。</p></div>
+    <div class="awaken">
+      <div><small>I</small><h3>感知啟蒙</h3><p>打開嗅覺的第一道門,重新認識「聞」這件事。</p></div>
+      <div><small>II</small><h3>情感連結</h3><p>氣味與情緒相遇,找到屬於自己的感受語言。</p></div>
+      <div><small>III</small><h3>記憶喚醒</h3><p>每一支氣味都是一段時光,喚起被遺忘的場景。</p></div>
+      <div><small>IV</small><h3>品味建構</h3><p>理解香調結構與層次,建立自己的選香判斷。</p></div>
+      <div><small>V</small><h3>自我表達</h3><p>讓氣味成為個人風格的延伸,說出無法言說的自己。</p></div>
+    </div>
+  </div></section>
+  <section class="sec"><div class="wrap">
+    <div class="sec-head"><span class="sub-en">Organizers</span><h2>主辦與協辦單位</h2></div>
+    <div class="awards">
+      <div class="award"><small>Organizer</small><h3>六赫茲 The Hex</h3><p>主辦|策展營運、品牌行銷與場域體驗設計。</p></div>
+      <div class="award"><small>Co-organizer</small><h3>ISSA 香氛協會</h3><p>產業網絡與國際連結|品牌資源與跨國交流支援。</p></div>
+      <div class="award"><small>Co-organizer</small><h3>中華民國調香師協會</h3><p>專業師資與產業背書|調香人才培育與認證支持。</p></div>
+    </div>
+  </div></section>
+</main>
+
+<!-- ============ VISIT ============ -->
+<main class="page" id="page-visit">
+  <header class="brands-hero"><div class="wrap">
+    <span class="eyebrow">Visit</span><h1>展覽資訊</h1>
+    <p>時間、地點、交通與展場動線一次看清楚。建議預留 2–3 小時,讓嗅覺有時間慢慢甦醒。</p>
+  </div></header>
+  <section class="sec"><div class="wrap">
+    <div class="hero-meta" style="margin-top:0">
+      <div><small>展期 DATE</small><strong>2026.10.30 Fri – 11.01 Sun(3 天)</strong></div>
+      <div><small>地點 VENUE</small><strong>華山1914文創園區 四連棟 A.B.C.D</strong></div>
+      <div><small>交通 ACCESS</small><strong>捷運忠孝新生站 1 號出口,步行約 5 分鐘</strong></div>
+      <div><small>開放時間 HOURS</small><strong>11:00 – 19:00(末日提早至 17:00)</strong></div>
+    </div>
+  </div></section>
+  <section class="sec alt"><div class="wrap">
+    <div class="sec-head"><span class="sub-en">Floor Plan</span><h2>展場規劃與動線</h2>
+      <p>四連棟 A.B.C.D 全區,品牌攤位、特色體驗與裝置藝術交錯安排,讓動線本身就是一條嗅覺的覺醒路徑。</p></div>
+    <div class="benefits">
+      <div class="benefit"><small>A·B·C·D</small><h3>品牌展區</h3><p>3×3 標準攤位、2×2 精巧攤位與市集攤位,依香調與品牌調性分區陳列。</p></div>
+      <div class="benefit"><small>4 區</small><h3>裝置藝術專區</h3><p>香氛 × 藝術的沉浸式展區,四件作品各對應一支專案氣味。</p></div>
+      <div class="benefit"><small>3–4 組</small><h3>調香工作坊區</h3><p>專業調香師帶領的體驗課程,從香調認識到親手調配。</p></div>
+      <div class="benefit"><small>Station</small><h3>嗅覺重置站</h3><p>有價票觀眾可兌換咖啡豆手持杯,讓疲勞的嗅覺中場歸零。</p></div>
+      <div class="benefit"><small>VIP</small><h3>沉浸體驗・VIP 休息區</h3><p>頌缽、精油、瑜伽的靜態體驗區,兼 VIP 探訪休息空間。</p></div>
+      <div class="benefit"><small>Café</small><h3>咖啡與紀念品</h3><p>咖啡飲食攤與官方紀念品販售,逛累了的補給站。</p></div>
+    </div>
+
+    <div class="sec-head" style="margin-top:clamp(46px,5vw,72px)">
+      <span class="sub-en">Booth Allocation</span><h2>展場分配</h2>
+      <p>各參展品牌依攤位區與品類配置（A·B·C·D 品牌展區、M 市集、S 供應鏈專區）。名單隨報名審核陸續更新，由主辦於後台 / Google Sheet 維護。點品牌可看介紹。</p>
+    </div>
+    <div id="allocation" class="alloc"></div>
+  </div></section>
+  <section class="sec"><div class="wrap">
+    <div class="sec-head"><span class="sub-en">Daily Schedule</span><h2>每日活動行事曆</h2></div>
+    <div class="timeline">
+      <div class="tday"><small>10/30 (五)</small><h3>開幕日</h3><ul><li>媒體 & KOL 優先入場</li><li>公開展覽開始</li><li>B2B 媒合會議</li><li>開幕酒會(VIP)</li></ul></div>
+      <div class="tday"><small>10/31 (六)</small><h3>主展日</h3><ul><li>全日開放</li><li>調香工作坊</li><li>品牌交流活動</li><li>沉浸體驗高峰</li></ul></div>
+      <div class="tday"><small>11/01 (日)</small><h3>閉幕日</h3><ul><li>氣味護照集章截止</li><li>現場抽獎</li><li>年度香氛大賞頒獎</li><li>公開展覽最終日</li></ul></div>
+    </div>
+    <p class="deposit-note" style="margin-top:30px">※ 10/28–10/29 為佈展期,不對外開放。</p>
+  </div></section>
+  <section class="sec alt"><div class="wrap">
+    <div class="sec-head"><span class="sub-en">Good to Know</span><h2>入場須知</h2></div>
+    <div class="cards">
+      <div class="card"><h3>票券與入場</h3><p>購買有價票即可於展期內單次入場,並可於嗅覺重置站兌換咖啡豆手持杯一份。票務詳情於 8 月開放購票時公布。</p></div>
+      <div class="card"><h3>氣味護照</h3><p>每位入場觀眾可領取氣味護照一本,走訪品牌收集試香紙與香氣卡,集章完成可參加閉幕日抽獎。</p></div>
+      <div class="card"><h3>攝影與寵物</h3><p>展場歡迎拍照打卡,部分裝置藝術區請依現場指示;基於香氛展性質,恕不開放寵物入場(導盲犬除外)。</p></div>
+      <div class="card"><h3>無障礙與服務台</h3><p>展場設有會場內服務台,提供諮詢、失物招領與無障礙協助。四連棟皆為平面動線,輪椅與嬰兒車皆可順行。</p></div>
+    </div>
+  </div></section>
+</main>
+
+<!-- ============ EXPERIENCE ============ -->
+<main class="page" id="page-experience">
+  <header class="brands-hero"><div class="wrap">
+    <span class="eyebrow">Exhibition Highlights</span><h1>特色體驗</h1>
+    <p>嗅覺島不只是逛展,而是一段被設計過的嗅覺旅程。四個關卡,帶你從聞、到記得、到帶回家。</p>
+  </div></header>
+  <section class="sec"><div class="wrap"><div class="cards">
+    <div class="card"><span class="tag">Scent Passport</span><h3>氣味護照</h3><h4>把今天聞到的,帶回家</h4><p>逛香氛展最常見的困擾——試香紙一把抓,出門全部混在一起。氣味護照讓每位觀眾入場領取專屬手冊,走訪品牌時將試香紙依序收入對應頁格,標示品牌與香調。聞過什麼、喜歡哪個,翻開一目瞭然,帶回家的是一整趟旅程的完整記錄。</p></div>
+    <div class="card"><span class="tag">Reset Station</span><h3>嗅覺重置站</h3><h4>咖啡豆,是這座島的中場休息</h4><p>聞太多香水後,鼻子會失去判斷力,每支聞起來都像同一支。購買有價票的觀眾可兌換一杯烘焙咖啡豆手持杯,需要清零時深吸一口,讓嗅覺回到剛進場的狀態,準備好遇見下一個品牌。</p></div>
+    <div class="card"><span class="tag">Scent × Art</span><h3>香氛藝術展區</h3><h4>當一件作品有了氣味</h4><p>嗅覺島邀請調香師以藝術創作為靈感,將作品核心的感受轉譯成一支氣味——不是描述,而是延伸。觀眾同時接觸一件創作與它對應的香氛,兩種感官指向同一個情感核心,讓感受比單用眼睛或耳朵更深一層。</p></div>
+    <div class="card"><span class="tag">Workshops</span><h3>調香工作坊</h3><h4>親手調出屬於你的氣味</h4><p>由專業調香師帶領,從香調認識、香水結構到實際調配,完成一支帶得走的個人香氣。主展日預計進行多場次、約 320 人次,名額有限,可於下方登記候補,開放報名時優先通知。</p></div>
+  </div></div></section>
+  <section class="sec alt"><div class="wrap">
+    <div class="sec-head"><span class="sub-en">Workshop Waitlist</span><h2>工作坊候補登記</h2>
+      <p>留下聯絡方式,調香工作坊開放報名時我們會優先通知你。</p></div>
+    <div class="formbox" style="max-width:680px">
+      <div class="frow"><label>姓名 NAME</label><input id="w-name" placeholder="你的名字"></div>
+      <div class="frow"><label>EMAIL <span class="req">*</span></label><input id="w-mail" type="email" placeholder="hello@you.com"></div>
+      <div class="frow"><label>偏好場次 SESSION</label>
+        <select id="w-session"><option>10/31 (六) 上午</option><option>10/31 (六) 下午</option><option>都可以</option></select></div>
+      <button class="btn btn-primary" onclick="submitWorkshop()">登記候補</button>
+      <div class="form-ok" id="wOk">✓ 已收到你的候補登記。工作坊開放報名時,我們會優先以 Email 通知你。</div>
+    </div>
+  </div></section>
+</main>
+
+<!-- ============ BRANDS DIRECTORY ============ -->
+<main class="page" id="page-brands">
+  <header class="brands-hero"><div class="wrap">
+    <span class="eyebrow">Exhibitors 2026</span><h1>參展品牌</h1>
+    <p>本屆嗅覺島將齊聚台灣、亞洲與歐日的香氛品牌。依香調、類型或產地尋找,點入品牌探索它的故事與作品。</p>
+  </div></header>
+  <section class="sec" style="padding-top:30px"><div class="wrap">
+    <div class="filterbar" id="filterbar"></div>
+    <div class="bcount" id="bcount"></div>
+    <div class="brandgrid" id="brandgrid"></div>
+  </div></section>
+</main>
+
+<!-- ============ BRAND DETAIL ============ -->
+<main class="page" id="page-brand">
+  <header class="bd-hero"><div class="wrap">
+    <button class="bd-back" onclick="go('brands')">← 返回品牌列表</button>
+    <div id="bd-head"></div>
+  </div></header>
+  <div class="bd-wrap" id="bd-body"></div>
+</main>
+
+<!-- ============ AWARDS ============ -->
+<main class="page" id="page-awards">
+  <header class="brands-hero"><div class="wrap">
+    <span class="eyebrow">Annual Fragrance Awards</span><h1>年度香氛大賞</h1>
+    <p>嗅覺島年度盛事的最高榮譽。透過評審團與觀眾票選,挑選出年度最具代表性的香氛作品與品牌,建立台灣香氛產業的權威榜單。頒獎典禮於 11/1 閉幕日舉行。</p>
+  </div></header>
+  <section class="sec"><div class="wrap">
+    <div class="sec-head"><span class="sub-en">Seasonal Awards</span><h2>四季香氛獎</h2>
+      <p>以台灣四季的空氣為題,選出最能代表每個季節的氣味。</p></div>
+    <div class="season">
+      <div class="scard"><div class="sen">SPRING</div><h4>年度春季香氛</h4><p>花香、青草、微潮土壤——台灣三月空氣的清新氣息。</p></div>
+      <div class="scard"><div class="sen">SUMMER</div><h4>年度夏季香氛</h4><p>海鹽、柑橘、白麝香——清爽不悶的濕熱夏日選擇。</p></div>
+      <div class="scard"><div class="sen">AUTUMN</div><h4>年度秋季香氛</h4><p>木質、辛香、乾燥果香——換季時沉穩內斂的氣味。</p></div>
+      <div class="scard"><div class="sen">WINTER</div><h4>年度冬季香氛</h4><p>琥珀、皮革、溫暖香草——圍巾與溫暖的冬日氣息。</p></div>
+    </div>
+    <div class="sec-head"><span class="sub-en">Annual Rankings</span><h2>年度榜單獎</h2></div>
+    <div class="cards rank3" style="margin-bottom:50px">
+      <div class="card"><span class="tag">Top 10</span><h3>台灣年度 TOP 10 香水</h3><p>評審評分結合觀眾票選,年度最重要的香水榜單。</p></div>
+      <div class="card highlight"><span class="tag">Collectible</span><h3>年度最值得收藏香水</h3><p>限量、小批量或具特殊意義,強調稀有性與收藏價值。</p></div>
+      <div class="card"><span class="tag">Top 10</span><h3>台灣年度 TOP 10 蠟燭</h3><p>評審評分結合觀眾票選,年度最重要的蠟燭榜單。</p></div>
+    </div>
+    <div class="sec-head"><span class="sub-en">Brand Awards</span><h2>品牌大獎</h2></div>
+    <div class="benefits">
+      <div class="benefit"><div class="starline"><span class="star">★</span><h3>年度最佳台灣品牌</h3></div><p>綜合品牌完整度、香氛品質與市場潛力的最高榮譽。</p></div>
+      <div class="benefit"><div class="starline"><span class="star">★</span><h3>年度最佳新興品牌</h3></div><p>創立三年以內、具突破性表現的新銳。</p></div>
+      <div class="benefit"><div class="starline"><span class="star">★</span><h3>年度最佳海外品牌</h3></div><p>在台灣市場表現突出的國際品牌。</p></div>
+      <div class="benefit"><div class="starline"><span class="star">★</span><h3>年度最佳品牌敘事</h3></div><p>故事、視覺、包裝整體說服力最強的品牌。</p></div>
+    </div>
+  </div></section>
+  <section class="sec deep"><div class="wrap">
+    <div class="sec-head"><span class="sub-en">Vote & Results</span><h2>評審與票選</h2>
+      <p>大賞由專業評審團評分結合現場觀眾票選共同產生。觀眾可於展期間透過氣味護照參與票選,得獎名單將於閉幕日頒獎後公布於本頁。</p></div>
+    <div class="cta-row">
+      <button class="btn btn-ghost" onclick="toast('觀眾票選將於展期間(10/30–11/01)開放')">觀眾票選 展期開放</button>
+      <button class="btn btn-ghost" onclick="toast('得獎名單將於 11/1 頒獎後公布')">得獎名單 展後公布</button>
+    </div>
+  </div></section>
+</main>
+
+<!-- ============ PARTNERS (B2B / MEDIA) ============ -->
+<main class="page" id="page-partners">
+  <header class="ex-hero"><div class="wrap">
+    <span class="eyebrow">B2B & Media</span><h1>B2B 採購・媒體合作</h1>
+    <p>嗅覺島是品牌與通路、媒體相遇的場合。百貨採購、選品買手、代理商與媒體夥伴,歡迎在這裡找到下一個合作對象。</p>
+  </div></header>
+  <section class="sec"><div class="wrap">
+    <div class="sec-head"><span class="sub-en">B2B Matching</span><h2>B2B 採購媒合</h2>
+      <p>週六閉館後設有專屬 B2B 媒合場,150–200 人次規模,邀請百貨採購、選品店買手、代理商與通路商,於同一場合直接對接多個採購決策者。買手可於下方登記,我們將寄送媒合場資訊與品牌名錄。</p></div>
+    <div class="formbox" style="max-width:720px">
+      <div class="frow"><label>公司 / 通路名稱 COMPANY</label><input id="bz-co" placeholder="例:○○百貨 / ○○選品"></div>
+      <div class="frow"><label>姓名與職稱 NAME & TITLE</label><input id="bz-name" placeholder="姓名・採購 / 買手 / 負責人"></div>
+      <div class="frow"><label>EMAIL <span class="req">*</span></label><input id="bz-mail" type="email" placeholder="buyer@company.com"></div>
+      <div class="frow"><label>通路類型 CHANNEL</label>
+        <select id="bz-type"><option>百貨專櫃</option><option>選品店 / 生活風格店</option><option>代理商 / 經銷</option><option>電商通路</option><option>其他</option></select></div>
+      <div class="frow"><label>採購需求 / 備註</label><textarea id="bz-msg" rows="3" placeholder="想找的品類、價格帶、合作形式…"></textarea></div>
+      <button class="btn btn-primary" onclick="submitBuyer()">登記買手資格</button>
+      <div class="form-ok" id="bzOk">✓ 已收到你的買手登記。我們將於展前寄送 B2B 媒合場資訊與參展品牌名錄。</div>
+    </div>
+  </div></section>
+  <section class="sec alt"><div class="wrap">
+    <div class="sec-head"><span class="sub-en">Press Center</span><h2>媒體中心</h2>
+      <p>提供媒體採訪、新聞稿與主視覺資料包。歡迎媒體夥伴來信索取。</p></div>
+    <div class="cards">
+      <div class="card"><span class="tag">Press Kit</span><h3>媒體資料包</h3><p>新聞稿、主視覺、Logo、展覽數據與高解析圖片。歡迎來信索取最新版本。</p>
+        <a class="btn btn-ghost" style="margin-top:16px" href="#" onclick="contactMail('媒體資料包索取');return false;">來信索取 →</a></div>
+      <div class="card"><span class="tag">Collaboration</span><h3>KOL / KOC 合作</h3><p>展前預熱、展中現場、展後延伸三階段創作者合作。歡迎香氛、生活風格創作者洽談。</p>
+        <button class="btn btn-ghost" style="margin-top:16px" onclick="go('contact')">洽談合作 →</button></div>
+    </div>
+  </div></section>
+</main>
+
+<!-- ============ CONTACT ============ -->
+<main class="page" id="page-contact">
+  <header class="brands-hero"><div class="wrap">
+    <span class="eyebrow">Contact</span><h1>聯絡我們</h1>
+    <p>不論是想參展、採訪、採購,或只是有問題想問,選擇對應主題留言,我們會盡快回覆。</p>
+  </div></header>
+  <section class="sec"><div class="wrap"><div class="form-grid">
+    <div class="formbox">
+      <div class="frow"><label>洽詢主題 TOPIC</label>
+        <select id="c-topic"><option>一般洽詢</option><option>品牌參展</option><option>媒體採訪</option><option>B2B 採購</option><option>KOL / KOC 合作</option></select></div>
+      <div class="frow"><label>姓名 / 單位 NAME</label><input id="c-name" placeholder="姓名或公司名稱"></div>
+      <div class="frow"><label>EMAIL <span class="req">*</span></label><input id="c-mail" type="email" placeholder="hello@you.com"></div>
+      <div class="frow"><label>訊息 MESSAGE</label><textarea id="c-msg" rows="5" placeholder="想跟我們說的話…"></textarea></div>
+      <button class="btn btn-primary" onclick="submitContact()">送出訊息</button>
+      <div class="form-ok" id="cOk">✓ 已收到你的訊息,我們會盡快回覆到你的信箱。</div>
+    </div>
+    <aside class="calc" style="position:static">
+      <h4>直接聯繫</h4>
+      <div class="csub">SOULAND 嗅覺島團隊</div>
+      <div class="cline"><span>Email</span><span class="num" style="font-size:.95rem" id="contact-mail">hello@scentisland.tw</span></div>
+      <div class="cline"><span>官網</span><span class="num" style="font-size:.95rem" id="contact-site">www.scentisland.tw</span></div>
+      <div class="cline"><span>主辦</span><span class="num" style="font-size:.95rem">六赫茲 The Hex</span></div>
+      <p class="cnote">參展招募期 2026/6/1–7/30,展位確認 8/15 前。其他合作歡迎隨時來信。</p>
+    </aside>
+  </div></div></section>
+</main>
+
+<!-- ============ 共用 FOOTER ============ -->
+<footer class="footer">
+  <div class="footer-nav">
+    <a onclick="go('home')">首頁</a><a onclick="go('about')">關於</a><a onclick="go('visit')">展覽資訊</a>
+    <a onclick="go('experience')">特色體驗</a><a onclick="go('brands')">參展品牌</a><a onclick="go('awards')">年度大賞</a>
+    <a onclick="go('partners')">B2B・媒體</a><a onclick="go('contact')">聯絡我們</a>
+    <a href="vendor.html">我要參展</a><a data-ticket-foot>購票</a>
+  </div>
+  <div class="wrap">
+    <div>
+      <div class="footer-brand"><img src="assets/logo-mark-light.png" alt="嗅覺島"><b>嗅覺島 SOULAND</b></div>
+      <small>主辦單位|六赫茲 The Hex — 策展營運、品牌行銷與場域體驗設計</small>
+      <small>協辦單位|ISSA 香氛協會・中華民國調香師協會</small>
+    </div>
+    <div>
+      <small style="letter-spacing:.24em;opacity:.6">CONTACT</small>
+      <small class="en-mail" id="foot-mail">HELLO@SCENTISLAND.TW</small>
+      <small class="en-mail" id="foot-site">WWW.SCENTISLAND.TW</small>
+    </div>
+  </div>
+</footer>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>
+  /* 套用 config 的聯絡資訊與頁尾購票連結 */
+  (function(){
+    const c=window.SOULAND_CONFIG||{};
+    if(c.CONTACT_EMAIL){
+      const cm=document.getElementById('contact-mail'); if(cm) cm.textContent=c.CONTACT_EMAIL;
+      const fm=document.getElementById('foot-mail'); if(fm) fm.textContent=c.CONTACT_EMAIL.toUpperCase();
+    }
+    if(c.SITE_URL){
+      const cs=document.getElementById('contact-site'); if(cs) cs.textContent=c.SITE_URL;
+      const fs=document.getElementById('foot-site'); if(fs) fs.textContent=c.SITE_URL.toUpperCase();
+    }
+    document.querySelectorAll('[data-ticket-foot]').forEach(a=>a.onclick=openTickets);
+  })();
+  function contactMail(subject){
+    const c=window.SOULAND_CONFIG||{};
+    const mail=c.CONTACT_EMAIL||'';
+    if(mail) window.location.href='mailto:'+mail+'?subject='+encodeURIComponent(subject||'洽詢');
+  }
+</script>
+</body>
+</html>

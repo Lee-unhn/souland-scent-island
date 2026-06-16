@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>參展廠商後台｜嗅覺島 SOULAND 2026</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/logo-mark-dark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#284664;--navy-d:#1d3349;--gold:#B89A5C;--paper:#EDE3D1;--cream:#FBF7EE;--ink:#211E18;--line:rgba(33,30,24,.14);--bad:#b1503f}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans TC',system-ui,sans-serif;background:#eef0f2;color:var(--ink);line-height:1.7}
+  a{color:inherit}
+  .wm{display:flex;align-items:center;gap:10px;font-family:'Noto Serif TC',serif;font-weight:600;letter-spacing:.1em}
+  .wm img{width:34px;height:34px}
+  .wm small{display:block;font-family:'Cormorant Garamond',serif;letter-spacing:.28em;font-size:.62rem;color:var(--gold)}
+  .btn{font-family:inherit;font-size:.92rem;letter-spacing:.08em;border:none;border-radius:8px;padding:.62rem 1.3rem;cursor:pointer;transition:.25s}
+  .btn-p{background:var(--navy);color:var(--cream)} .btn-p:hover{background:var(--navy-d)}
+  .btn-g{background:transparent;border:1px solid var(--navy);color:var(--navy)} .btn-g:hover{background:var(--navy);color:var(--cream)}
+  .btn-d{background:#fff;border:1px solid var(--bad);color:var(--bad)} .btn-d:hover{background:var(--bad);color:#fff}
+  .btn-s{font-size:.82rem;padding:.4rem .9rem}
+  .btn[disabled]{opacity:.55;cursor:not-allowed}
+
+  /* login */
+  #login{min-height:100vh;display:grid;place-items:center;padding:20px;
+    background:linear-gradient(160deg,#cdd7e1,#bcc8d6 55%,var(--paper))}
+  .login-card{background:var(--cream);border:1px solid rgba(184,154,92,.4);border-radius:16px;
+    padding:2.6rem;width:100%;max-width:380px;box-shadow:0 24px 60px -28px rgba(40,70,100,.5);text-align:center}
+  .login-card .wm{justify-content:center;margin-bottom:.4rem}
+  .login-card h1{font-family:'Noto Serif TC',serif;font-size:1.3rem;margin:1rem 0 .3rem;letter-spacing:.06em}
+  .login-card p.sub{font-size:.84rem;color:#8a8170;margin-bottom:1.6rem}
+  .fld{text-align:left;margin:.9rem 0}
+  .fld label{display:block;font-size:.82rem;color:#5a5142;margin-bottom:.35rem;letter-spacing:.06em}
+  .fld input,.fld select,.fld textarea{width:100%;font-family:inherit;font-size:.95rem;color:var(--ink);
+    background:#fff;border:1px solid var(--line);border-radius:8px;padding:.7rem .9rem;transition:.2s}
+  .fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(40,70,100,.13)}
+  .login-card .btn-p{width:100%;margin-top:.6rem}
+  .err{color:var(--bad);font-size:.84rem;min-height:1.2em;margin-top:.5rem}
+  .hint{font-size:.74rem;color:#a99;margin-top:1rem}
+
+  /* app */
+  #app{display:none}
+  .topbar{background:var(--navy);color:var(--cream);display:flex;align-items:center;justify-content:space-between;
+    padding:.9rem clamp(1rem,4vw,2.4rem)}
+  .topbar .wm small{color:var(--gold)} .topbar .wm{color:var(--cream)}
+  .topbar .right{display:flex;align-items:center;gap:1rem;font-size:.86rem}
+  .topbar .right b{color:var(--gold)}
+  .wrap{max-width:1140px;margin:0 auto;padding:clamp(1.2rem,3vw,2.2rem)}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.4rem;flex-wrap:wrap}
+  .bar h2{font-family:'Noto Serif TC',serif;font-size:1.4rem;letter-spacing:.06em}
+  .bar h2 span{font-size:.86rem;color:#8a8170;font-family:inherit;font-weight:400;margin-left:.6rem}
+
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px -22px rgba(0,0,0,.4)}
+  th,td{text-align:left;padding:.8rem 1rem;border-bottom:1px solid var(--line);font-size:.9rem;vertical-align:middle}
+  th{background:#f5f1ea;font-weight:500;letter-spacing:.06em;color:#5a5142;font-size:.8rem}
+  tr:last-child td{border-bottom:none}
+  .pill{font-size:.74rem;padding:.18rem .6rem;border-radius:999px}
+  .pill.on{background:#e7f0e4;color:#3c6e4a} .pill.off{background:#f0e6e2;color:#9a6450}
+  td .acts{display:flex;gap:.5rem;justify-content:flex-end}
+  .empty{background:#fff;border-radius:12px;padding:3rem;text-align:center;color:#8a8170}
+  .tabs{display:flex;gap:.4rem;margin-bottom:1.4rem;border-bottom:1px solid var(--line)}
+  .tab{font-family:inherit;font-size:.95rem;letter-spacing:.06em;background:none;border:none;cursor:pointer;
+    padding:.7rem 1.2rem;color:#8a8170;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.2s}
+  .tab.on{color:var(--navy);border-bottom-color:var(--gold);font-weight:500}
+  .tab:hover:not(.on){color:var(--navy)}
+  .reg-note{font-size:.84rem;color:#8a8170;margin:-.4rem 0 1rem}
+  .st-sel{font-family:inherit;font-size:.84rem;padding:.32rem .5rem;border:1px solid var(--line);border-radius:7px;background:#fff;cursor:pointer}
+  .reg-amt{font-family:'Cormorant Garamond',serif;color:var(--navy);white-space:nowrap}
+  td.reg-brand b{color:var(--navy)} td.reg-brand small{color:#8a8170}
+
+  /* editor modal */
+  .mask{position:fixed;inset:0;background:rgba(29,51,73,.55);display:none;place-items:center;padding:20px;z-index:50;overflow:auto}
+  .mask.show{display:grid}
+  .modal{background:var(--cream);border-radius:16px;width:100%;max-width:720px;max-height:92vh;overflow:auto;box-shadow:0 30px 80px -30px rgba(0,0,0,.6)}
+  .modal-h{position:sticky;top:0;background:var(--navy);color:var(--cream);padding:1.1rem 1.6rem;display:flex;justify-content:space-between;align-items:center;z-index:2}
+  .modal-h h3{font-family:'Noto Serif TC',serif;font-size:1.15rem;letter-spacing:.06em}
+  .modal-h .x{background:none;border:none;color:var(--cream);font-size:1.5rem;cursor:pointer;line-height:1}
+  .modal-b{padding:1.6rem}
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+  @media(max-width:560px){.g2{grid-template-columns:1fr}}
+  .seg{font-family:'Cormorant Garamond',serif;letter-spacing:.2em;text-transform:uppercase;font-size:.72rem;color:var(--gold);margin:1.2rem 0 .2rem;border-top:1px solid var(--line);padding-top:1rem}
+  .seg:first-child{border-top:none;padding-top:0;margin-top:0}
+  .prod{border:1px solid var(--line);border-radius:10px;padding:.9rem;margin-bottom:.7rem;background:#fff}
+  .prod .g3{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+  .prod .rm{font-size:.78rem;color:var(--bad);background:none;border:none;cursor:pointer;float:right}
+  .toggle{display:flex;align-items:center;gap:.6rem;margin:.6rem 0;font-size:.9rem}
+  .toggle input{width:auto;accent-color:var(--navy)}
+  .modal-f{position:sticky;bottom:0;background:var(--cream);border-top:1px solid var(--line);padding:1rem 1.6rem;display:flex;gap:.8rem;justify-content:flex-end}
+
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:var(--cream);
+    padding:.7rem 1.3rem;border-radius:999px;font-size:.88rem;opacity:0;pointer-events:none;transition:.3s;z-index:100}
+  .toast.show{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<section id="login">
+  <div class="login-card">
+    <div class="wm"><img src="assets/logo-mark-dark.png" alt=""><span>嗅覺島<small>SOULAND ADMIN</small></span></div>
+    <h1>參展廠商後台</h1>
+    <p class="sub">請登入以管理參展品牌資料</p>
+    <div class="fld"><label>帳號 USERNAME</label><input id="l-user" autocomplete="username" placeholder="帳號"></div>
+    <div class="fld"><label>密碼 PASSWORD</label><input id="l-pass" type="password" autocomplete="current-password" placeholder="密碼"></div>
+    <div class="err" id="l-err"></div>
+    <button class="btn btn-p" id="l-btn" onclick="doLogin()">登入</button>
+    <div class="hint">預設帳密 admin / souland2026（可於 server/.env 修改）</div>
+  </div>
+</section>
+
+<!-- ============ APP ============ -->
+<div id="app">
+  <div class="topbar">
+    <div class="wm"><img src="assets/logo-mark-light.png" alt=""><span>嗅覺島<small>SOULAND ADMIN</small></span></div>
+    <div class="right"><span>操作人員：<b id="who">—</b></span><button class="btn btn-g btn-s" onclick="logout()">登出</button></div>
+  </div>
+  <div class="wrap">
+    <div class="tabs">
+      <button class="tab on" id="tab-brands" onclick="switchTab('brands')">參展廠商</button>
+      <button class="tab" id="tab-regs" onclick="switchTab('regs')">報名管理</button>
+    </div>
+
+    <div id="view-brands">
+      <div class="bar">
+        <h2>參展廠商管理 <span id="count"></span></h2>
+        <button class="btn btn-p" onclick="openEditor()">＋ 新增參展廠商</button>
+      </div>
+      <div id="list"></div>
+    </div>
+
+    <div id="view-regs" style="display:none">
+      <div class="bar">
+        <h2>報名管理 <span id="regCount"></span></h2>
+        <button class="btn btn-g btn-s" onclick="loadRegs()">↻ 重新整理</button>
+      </div>
+      <p class="reg-note">此處即「報名回寫 Google Sheet」的同一份資料。改狀態會同步回寫 Sheet 狀態欄。</p>
+      <div id="regList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ EDITOR ============ -->
+<div class="mask" id="mask">
+  <div class="modal">
+    <div class="modal-h"><h3 id="m-title">新增參展廠商</h3><button class="x" onclick="closeEditor()">×</button></div>
+    <div class="modal-b">
+      <input type="hidden" id="m-id">
+      <div class="seg">基本</div>
+      <div class="g2">
+        <div class="fld"><label>品牌名稱（中）*</label><input id="m-name" placeholder="必填"></div>
+        <div class="fld"><label>品牌英文名</label><input id="m-en" placeholder="Brand (EN)"></div>
+      </div>
+      <div class="g2">
+        <div class="fld"><label>類型</label>
+          <select id="m-type"><option value="">—</option><option>香水</option><option>居家香氛</option><option>香氛蠟燭</option><option>香氛保養</option><option>其他香氛</option><option>供應鏈</option></select>
+        </div>
+        <div class="fld"><label>主要產地</label><input id="m-country" placeholder="例:台灣 / 日本 / 法國"></div>
+      </div>
+      <div class="g2">
+        <div class="fld"><label>攤位編號</label><input id="m-booth" placeholder="例:A-12"></div>
+        <div class="fld"><label>品牌社群連結</label><input id="m-social" placeholder="https://"></div>
+      </div>
+      <div class="fld"><label>品牌 Logo 圖片網址（選填）</label><input id="m-logo" placeholder="https://…/logo.png"></div>
+
+      <div class="seg">香調結構</div>
+      <div class="g2">
+        <div class="fld"><label>前調 TOP</label><input id="m-top" placeholder="例:佛手柑、海鹽"></div>
+        <div class="fld"><label>中調 HEART</label><input id="m-heart" placeholder="例:茉莉、玫瑰"></div>
+      </div>
+      <div class="fld"><label>後調 BASE</label><input id="m-base" placeholder="例:檀香、麝香"></div>
+
+      <div class="seg">品牌故事</div>
+      <div class="fld"><textarea id="m-story" rows="4" placeholder="品牌故事與定位…"></textarea></div>
+
+      <div class="seg">產品推薦</div>
+      <div id="prods"></div>
+      <button class="btn btn-g btn-s" type="button" onclick="addProd()">＋ 新增產品</button>
+
+      <div class="seg">發布</div>
+      <label class="toggle"><input type="checkbox" id="m-pub" checked> 在官網「參展品牌」頁公開顯示</label>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-g" onclick="closeEditor()">取消</button>
+      <button class="btn btn-p" id="m-save" onclick="saveBrand(this)">儲存</button>
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>
