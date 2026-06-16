@@ -72,3 +72,42 @@ window.SOULAND_NET = {
   post(action, data){ return this._call(action, data); },
   get(action){ return this._call(action, null); }
 };
+
+/* =====================================================================
+   全站文字覆蓋（L3b）：讀「文案」Sheet 的「原文 → 新文字」對照表，
+   頁面載入後把畫面上「等於原文」的文字換成「新文字」。
+   ・沒填新文字的維持原文 → 不影響載入速度（原文一開始就顯示，只有改過的會更新）。
+   ・後台(admin) 不套用。表單 placeholder 等屬性文字暫不替換（之後可擴充）。
+   你只要在 Google「文案」Sheet 的「新文字」欄填字 → 重整官網即生效。
+   ===================================================================== */
+window.SOULAND_TEXT = {
+  _skip(){ return /admin/i.test(location.pathname) || !window.SOULAND_NET || !SOULAND_NET.live(); },
+  apply(){
+    if(this._skip()) return;
+    SOULAND_NET.get('textGet').then(function(resp){
+      var map = resp && resp.ok && resp.map;
+      if(!map || !Object.keys(map).length) return;
+      // 標題（<title>，不在 body 內，單獨處理）
+      var dt = (document.title || '').trim();
+      if(map.hasOwnProperty(dt) && map[dt]) document.title = map[dt];
+      // 走訪 body 內所有文字節點，整段相等才替換（保留前後空白）
+      var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode: function(n){
+          var p = n.parentNode; if(!p) return NodeFilter.FILTER_REJECT;
+          var tag = p.nodeName;
+          if(tag==='SCRIPT'||tag==='STYLE'||tag==='TEXTAREA'||tag==='NOSCRIPT') return NodeFilter.FILTER_REJECT;
+          return (n.nodeValue && n.nodeValue.trim()) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        }
+      });
+      var nodes=[], cur;
+      while((cur=walker.nextNode())) nodes.push(cur);
+      nodes.forEach(function(n){
+        var t = n.nodeValue.trim();
+        if(map.hasOwnProperty(t) && map[t]!=='') n.nodeValue = n.nodeValue.replace(t, map[t]);
+      });
+    }).catch(function(){ /* 後端未設定或逾時 → 靜默維持原文 */ });
+  }
+};
+if(document.readyState==='loading')
+  document.addEventListener('DOMContentLoaded', function(){ SOULAND_TEXT.apply(); });
+else SOULAND_TEXT.apply();
