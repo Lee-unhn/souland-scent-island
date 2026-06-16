@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>付款結果｜嗅覺島 SOULAND 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .result { min-height:100svh; display:grid; place-items:center; background:linear-gradient(160deg,#cdd7e1,#bcc8d6 55%,var(--paper)); padding:2rem; }
+  .result .card { background:var(--paper-cream); border:1px solid var(--line-gold); border-radius:18px; padding:clamp(2rem,5vw,3.6rem); max-width:520px; width:100%; text-align:center; box-shadow:var(--shadow); }
+  .result .icon { width:84px;height:84px;border-radius:50%;display:grid;place-items:center;margin:0 auto 1.6rem;font-size:2.4rem; }
+  .result.ok .icon { background:radial-gradient(circle at 35% 35%,var(--gold-soft),var(--gold-deep)); color:#fff; }
+  .result.fail .icon { background:rgba(180,80,63,.15); color:#8d3a2c; border:1px solid rgba(180,80,63,.3); }
+  .result h1 { font-family:var(--serif); font-size:1.9rem; letter-spacing:.06em; margin-bottom:.6rem; }
+  .result p { color:var(--ink-soft); }
+  .result .order { font-family:var(--latin); letter-spacing:.1em; color:var(--gold-deep); margin:1.2rem 0; padding:.6rem 1rem; background:var(--paper-deep); border-radius:8px; display:inline-block; }
+  .result .acts { margin-top:1.8rem; display:flex; gap:.8rem; justify-content:center; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+<div class="result" id="result">
+  <div class="card">
+    <div class="icon" id="icon">✦</div>
+    <h1 id="title">付款處理中</h1>
+    <p id="desc">正在確認您的付款結果…</p>
+    <div class="order" id="order" hidden></div>
+    <p id="next" style="font-size:.88rem;color:var(--ink-faint);margin-top:1rem"></p>
+    <div class="acts">
+      <a class="btn btn-primary" href="index.html">返回首頁</a>
+      <a class="btn btn-ghost" href="apply.html">查看參展方案</a>
+    </div>
+  </div>
+</div>
+<script>
+  const p = new URLSearchParams(location.search);
+  const status = p.get('status'), order = p.get('order'), msg = p.get('msg');
+  const root = document.getElementById('result');
+  if (status === 'success') {
+    root.classList.add('ok');
+    document.getElementById('icon').textContent = '✓';
+    document.getElementById('title').textContent = '報名與付款完成';
+    document.getElementById('desc').textContent = '感謝您報名嗅覺島 SOULAND 2026！款項已收訖，主辦單位將於 5–7 個工作天內完成審核並與您聯繫確認展位。';
+    document.getElementById('next').textContent = '確認信將寄至您填寫的電子郵件。期待與您共創香氛盛事。';
+  } else if (status === 'fail') {
+    root.classList.add('fail');
+    document.getElementById('icon').textContent = '!';
+    document.getElementById('title').textContent = '付款未完成';
+    document.getElementById('desc').textContent = '本次付款未成功' + (msg ? '（' + msg + '）' : '') + '。您的報名資料已保留，可重新嘗試付款或與我們聯繫。';
+    document.getElementById('next').innerHTML = '聯絡：<a href="mailto:hello@scentisland.tw" style="color:var(--gold-deep)">hello@scentisland.tw</a>';
+  } else {
+    root.classList.add('ok');
+    document.getElementById('title').textContent = '感謝您的報名';
+    document.getElementById('desc').textContent = '若您已完成付款，主辦單位將盡快與您聯繫。';
+  }
+  if (order) { const o = document.getElementById('order'); o.hidden = false; o.textContent = '報名單號 ' + order; }
+</script>
+</body>
+</html>

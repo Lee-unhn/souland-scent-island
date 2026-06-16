@@ -1,0 +1,16 @@
+{
+  "name": "souland-scent-island-2026",
+  "version": "1.0.0",
+  "description": "嗅覺島 SOULAND 2026 招商報名網站 — 報名 + ECPay 測試金流 + Google Sheet 回寫",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}

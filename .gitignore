@@ -1,0 +1,14 @@
+node_modules/
+.env
+server/.env
+server/registrations.json
+.DS_Store
+npm-debug.log*
+
+# 舊單頁版（本機保留，不進 repo）
+public/_legacy_singlepage/
+
+# 未使用的大圖（本機保留，不進 repo）
+public/assets/logo-kraft.jpg
+public/assets/poster-island.jpg
+public/assets/pv-03.jpg

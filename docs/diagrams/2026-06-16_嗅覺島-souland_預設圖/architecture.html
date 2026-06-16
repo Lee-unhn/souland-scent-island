@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>嗅覺島 SOULAND · 架構圖 (2026-06-16 預設圖)</title>
+<style>
+  :root{
+    --bg:#11111b; --panel:#181825; --panel2:#1e1e2e; --text:#cdd6f4; --sub:#a6adc8;
+    --line:#313244; --accent:#cba6f7;
+    --sky:#74c7ec; --lavender:#cba6f7; --yellow:#f9e2af; --peach:#fab387;
+    --green:#a6e3a1; --pink:#f5c2e7; --teal:#94e2d5; --gray:#6c7086;
+    --mm-focus:#f9e2af; --mm-anc:#f38ba8; --mm-desc:#89b4fa;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif;}
+  .app{display:flex;flex-direction:column;height:100vh;}
+  header{padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  header h1{font-size:15px;margin:0;font-weight:600;letter-spacing:.5px;}
+  header .meta{font-size:11px;color:var(--sub);}
+  nav{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap;}
+  nav button{background:var(--panel2);color:var(--text);border:1px solid var(--line);
+    border-radius:7px;padding:6px 11px;font-size:12.5px;cursor:pointer;transition:.15s;}
+  nav button:hover{border-color:var(--accent);}
+  nav button.active{background:var(--accent);color:#11111b;border-color:var(--accent);font-weight:600;}
+  nav button.mm-related{background:var(--mm-focus);color:#11111b;
+    outline:2px solid var(--mm-focus);outline-offset:1px;border-color:var(--mm-focus);}
+  .body{display:flex;flex:1;min-height:0;}
+  .stage{position:relative;flex:1;min-width:0;overflow:hidden;background:var(--bg);}
+  .diagram-pane{position:absolute;inset:0;display:none;}
+  .diagram-pane.active{display:block;}
+  .diagram-pane svg{width:100%;height:100%;}
+  .zoom-ctl{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:6px;z-index:20;}
+  .zoom-ctl button{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--text);font-size:17px;cursor:pointer;line-height:1;}
+  .zoom-ctl button:hover{border-color:var(--accent);}
+  /* Legend sidebar */
+  aside{width:300px;min-width:300px;background:var(--panel);border-left:1px solid var(--line);
+    overflow-y:auto;padding:14px 14px 40px;font-size:12px;}
+  aside h2{font-size:12.5px;margin:14px 0 8px;color:var(--accent);
+    text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--line);padding-bottom:4px;}
+  aside h2:first-child{margin-top:0;}
+  .leg{display:flex;align-items:center;gap:9px;margin:5px 0;line-height:1.35;}
+  .sw{width:18px;height:18px;border-radius:4px;flex:0 0 auto;border:1px solid rgba(255,255,255,.15);}
+  .leg .k{color:var(--text);font-weight:600;}
+  .leg .v{color:var(--sub);}
+  .shape{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--yellow);}
+  .note{color:var(--sub);font-size:11px;line-height:1.5;margin-top:6px;
+    background:var(--panel2);padding:7px 9px;border-radius:6px;border:1px solid var(--line);}
+  /* mind map highlight classes */
+  .mm-dim{opacity:.18;transition:opacity .15s;}
+  .edge-dim{opacity:.12 !important;transition:opacity .15s;}
+  g.mm-focus rect,g.mm-focus .node-bkg,g.mm-focus path{stroke:var(--mm-focus) !important;stroke-width:3px !important;
+    filter:drop-shadow(0 0 7px var(--mm-focus));}
+  g.mm-focus text,g.mm-focus span,g.mm-focus .nodeLabel{fill:var(--mm-focus) !important;color:var(--mm-focus) !important;font-weight:700 !important;}
+  g.mm-anc rect,g.mm-anc .node-bkg,g.mm-anc path{stroke:var(--mm-anc) !important;stroke-width:2.5px !important;}
+  g.mm-anc text,g.mm-anc span,g.mm-anc .nodeLabel{fill:var(--mm-anc) !important;color:var(--mm-anc) !important;font-weight:600 !important;}
+  g.mm-desc rect,g.mm-desc .node-bkg,g.mm-desc path{stroke:var(--mm-desc) !important;stroke-width:2.5px !important;}
+  g.mm-desc text,g.mm-desc span,g.mm-desc .nodeLabel{fill:var(--mm-desc) !important;color:var(--mm-desc) !important;font-weight:600 !important;}
+  .edge-anc path,path.edge-anc{stroke:var(--mm-anc) !important;stroke-width:2.5px !important;opacity:1 !important;}
+  .edge-desc path,path.edge-desc{stroke:var(--mm-desc) !important;stroke-width:2.5px !important;opacity:1 !important;}
+  /* mind map hint */
+  .mm-hint{position:absolute;left:12px;bottom:12px;z-index:20;background:rgba(24,24,37,.92);
+    border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:11px;max-width:560px;}
+  .mm-hint .row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:3px 0;}
+  .mm-hint .meta{color:var(--sub);}
+  .mm-hint .tag{padding:1px 7px;border-radius:5px;font-weight:600;color:#11111b;font-size:10.5px;}
+  .mm-hint .tag.focus{background:var(--mm-focus);}
+  .mm-hint .tag.anc{background:var(--mm-anc);}
+  .mm-hint .tag.desc{background:var(--mm-desc);}
+  .mm-hint .tag.dim{background:var(--gray);opacity:.55;color:#cdd6f4;}
+  .mm-hint kbd{background:var(--panel2);border:1px solid var(--line);border-radius:4px;
+    padding:0 5px;font-size:10px;}
+  .err{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    color:var(--peach);font-size:13px;padding:20px;text-align:center;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>🏝️ 嗅覺島 SOULAND · 招商報名網站</h1>
+    <span class="meta">2026-06-16 預設圖 (baseline) · 華山1914 · 共同主辦 The Hex</span>
+    <nav id="nav">
+      <button data-tab="sys" class="active">🗺️ 系統總圖</button>
+      <button data-tab="mind">🧠 思維導圖</button>
+    </nav>
+  </header>
+
+  <div class="body">
+    <div class="stage">
+      <div class="zoom-ctl">
+        <button id="zin" title="放大">＋</button>
+        <button id="zout" title="縮小">－</button>
+        <button id="zfit" title="重置">⟲</button>
+      </div>
+
+      <div class="diagram-pane active" id="pane-sys"></div>
+      <div class="diagram-pane" id="pane-mind">
+        <div class="mm-hint">
+          <div class="row">
+            <span class="meta">click →</span>
+            <span class="tag focus">focus</span> +
+            <span class="tag anc">祖先 ancestors</span> +
+            <span class="tag desc">子孫 descendants</span> ·
+            <span class="tag dim">others 18%</span>
+            <span class="meta">edges 12%</span>
+          </div>
+          <div class="row meta">↑ 上方 tab 同步：點到節點所屬子圖</div>
+          <div class="row meta">reset · <kbd>Esc</kbd> / 點空白 · pan · 拖曳 drag · zoom · 滾輪 wheel</div>
+        </div>
+      </div>
+    </div>
+
+    <aside>
+      <h2>🎨 節點配色 Node Palette</h2>
+      <div class="leg"><span class="sw" style="background:var(--sky)"></span><span><span class="k">#74c7ec</span> <span class="v">使用者輸入</span></span></div>
+      <div class="leg"><span class="sw" style="background:var(--lavender)"></span><span><span class="k">#cba6f7</span> <span class="v">UI 元件</span></span></div>
+      <div class="leg"><span class="sw" style="background:var(--yellow)"></span><span><span class="k">#f9e2af</span> <span class="v">處理階段</span></span></div>
+      <div class="leg"><span class="sw" style="background:var(--peach)"></span><span><span class="k">#fab387</span> <span class="v">安全/Guard (CheckMacValue 驗章)</span></span></div>
+      <div class="leg"><span class="sw" style="background:var(--green)"></span><span><span class="k">#a6e3a1</span> <span class="v">外部資源 (ECPay / Sheet)</span></span></div>
+      <div class="leg"><span class="sw" style="background:var(--pink)"></span><span><span class="k">#f5c2e7</span> <span class="v">輸出檔 (registrations.json / 付款結果)</span></span></div>
+      <div class="leg"><span class="sw" style="background:var(--teal)"></span><span><span class="k">#94e2d5</span> <span class="v">執行緒 / worker</span></span></div>
+      <div class="leg"><span class="sw" style="background:var(--gray)"></span><span><span class="k">#6c7086</span> <span class="v">已棄用</span></span></div>
+
+      <h2>🔷 形狀 Shape</h2>
+      <div class="leg"><span class="shape">[x]</span><span class="v">矩形 · 一般元件</span></div>
+      <div class="leg"><span class="shape">([x])</span><span class="v">圓角 · 入口</span></div>
+      <div class="leg"><span class="shape">[(x)]</span><span class="v">圓柱 · 資料儲存</span></div>
+      <div class="leg"><span class="shape">[/x/]</span><span class="v">梯形 · 處理轉換</span></div>
+      <div class="leg"><span class="shape">{{x}}</span><span class="v">六角 · 驗章閘門</span></div>
+
+      <h2>➡️ 連線 Line</h2>
+      <div class="leg"><span class="shape">--&gt;</span><span class="v">實線 · 直接資料流</span></div>
+      <div class="leg"><span class="shape">-.-&gt;</span><span class="v">虛線 · 事件 / 信號</span></div>
+
+      <h2>🧠 Mind Map 互動色</h2>
+      <div class="leg"><span class="sw" style="background:var(--mm-focus)"></span><span><span class="k">#f9e2af</span> <span class="v">focus 點選節點</span></span></div>
+      <div class="leg"><span class="sw" style="background:var(--mm-anc)"></span><span><span class="k">#f38ba8</span> <span class="v">祖先 ancestors → root</span></span></div>
+      <div class="leg"><span class="sw" style="background:var(--mm-desc)"></span><span><span class="k">#89b4fa</span> <span class="v">子孫 descendants subtree</span></span></div>
+      <div class="leg"><span class="sw" style="background:var(--gray)"></span><span><span class="k">#6c7086</span> <span class="v">dim others 18%</span></span></div>
+      <div class="note">此 yellow / red / blue 三色組僅用於思維導圖互動，<b>不與</b>上方節點配色重疊。</div>
+    </aside>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+<script>
+/* ---------- inline .mmd fallbacks (work via file://) ---------- */
+const SYS_FALLBACK = `%%{init: {'flowchart': {'rankSpacing': 70, 'nodeSpacing': 30, 'curve': 'basis'}} }%%
+flowchart LR
+    USER([使用者 參展品牌])
+    BROWSER[瀏覽器]
+
+    subgraph FE[前端 · public 靜態]
+        direction TB
+        INDEX[index.html 主頁/展覽資訊/特色體驗/品牌/年度大賞]
+        APPLY[apply.html 參展方案/流程/報名表/費用試算]
+        DONE[payment-complete.html 付款結果頁]
+        ASSETS[css style.css apply.css · js main.js apply.js]
+    end
+
+    subgraph BE[後端 · server/server.js Express]
+        direction TB
+        STATIC[/express.static 服務 public/]
+        REG[/POST /api/register 驗證/]
+        ECPAY[/POST /api/payment/ecpay 產生送出表單/]
+        RESULT[/POST /api/payment/result 導回驗章/]
+        NOTIFY[/POST /api/payment/notify S2S 驗章/]
+        MAC{{CheckMacValue 驗章}}
+        LOCALDB[(registrations.json 本機備份)]
+    end
+
+    subgraph EXT[外部資源]
+        direction TB
+        GAS[Apps Script Code.gs doPost webhook]
+        SHEET[(Google Sheet 報名分頁)]
+        ECPAYSTAGE[(ECPay STAGE payment-stage.ecpay.com.tw)]
+    end
+
+    PAYRESULT[付款結果 已付款]
+
+    USER --> BROWSER
+    BROWSER --> INDEX
+    BROWSER --> APPLY
+    BROWSER --> DONE
+    INDEX -.-> ASSETS
+    APPLY -.-> ASSETS
+    DONE -.-> ASSETS
+
+    BROWSER --> STATIC
+    STATIC --> INDEX
+    STATIC --> APPLY
+    STATIC --> DONE
+
+    APPLY --> REG
+    REG --> LOCALDB
+    REG --> GAS
+    GAS --> SHEET
+
+    APPLY --> ECPAY
+    ECPAY --> MAC
+    MAC --> ECPAYSTAGE
+    ECPAYSTAGE -.-> RESULT
+    ECPAYSTAGE -.-> NOTIFY
+    RESULT --> MAC
+    NOTIFY --> MAC
+    RESULT --> SHEET
+    NOTIFY --> SHEET
+    RESULT --> DONE
+    RESULT --> PAYRESULT
+    NOTIFY --> PAYRESULT
+
+    classDef sky fill:#74c7ec,stroke:#1e66f5,color:#11111b;
+    classDef lavender fill:#cba6f7,stroke:#8839ef,color:#11111b;
+    classDef yellow fill:#f9e2af,stroke:#df8e1d,color:#11111b;
+    classDef peach fill:#fab387,stroke:#fe640b,color:#11111b;
+    classDef green fill:#a6e3a1,stroke:#40a02b,color:#11111b;
+    classDef pink fill:#f5c2e7,stroke:#ea76cb,color:#11111b;
+    classDef teal fill:#94e2d5,stroke:#179299,color:#11111b;
+
+    class USER sky;
+    class BROWSER,INDEX,APPLY,DONE,ASSETS lavender;
+    class STATIC,REG,ECPAY,RESULT,NOTIFY yellow;
+    class MAC peach;
+    class GAS,SHEET,ECPAYSTAGE green;
+    class LOCALDB,PAYRESULT pink;`;
+
+const MIND_FALLBACK = `mindmap
+  root((嗅覺島 SOULAND))
+    🏠 前端頁面
+      主頁 index.html
+        展覽資訊
+        特色體驗
+        參展品牌牆
+        年度大賞
+      報名頁 apply.html
+        參展方案
+        申請流程
+        報名表
+        費用試算
+      付款結果頁 payment-complete.html
+    ⚙️ 後端 API
+      express.static
+      POST /api/register
+      POST /api/payment/ecpay
+      POST /api/payment/result
+      POST /api/payment/notify
+      registrations.json 備份
+    💳 金流 ECPay
+      CheckMacValue
+      測試特店 2000132
+      付款方式
+        信用卡
+        ATM
+        超商
+      測試卡 4311952222222222
+      STAGE 測試環境
+    📊 報名回寫 Sheet
+      Apps Script
+      doPost
+      自動寫表頭
+      逐筆 append
+      付款狀態回寫
+    🎨 視覺設計
+      牛皮紙 EDE3D1
+      霧藍 5E7891
+      金月 C2A05E
+      Noto Serif TC
+      地形等高線
+    🧭 專案治理
+      L1 Chief of Staff
+      L2 Project Shepherd
+      階段 P0-P6
+      本機可跑版`;
+
+/* ---------- load .mmd (fetch w/ fallback for file://) ---------- */
+async function loadMmd(file, fallback){
+  try{
+    const r = await fetch(file, {cache:'no-store'});
+    if(!r.ok) throw new Error('http '+r.status);
+    const t = await r.text();
+    if(!t || !t.trim()) throw new Error('empty');
+    return t;
+  }catch(e){
+    return fallback; // file:// or fetch blocked → inline copy
+  }
+}
+
+mermaid.initialize({
+  startOnLoad:false, securityLevel:'loose', theme:'dark',
+  themeVariables:{ darkMode:true, background:'#11111b', fontFamily:'Noto Sans TC, sans-serif',
+    primaryColor:'#1e1e2e', primaryTextColor:'#cdd6f4', lineColor:'#7f849c',
+    mainBkg:'#1e1e2e', clusterBkg:'#181825', clusterBorder:'#45475a' },
+  mindmap:{ padding:14 }
+});
+
+const panes = {
+  sys:{el:document.getElementById('pane-sys'), pz:null, rendered:false, src:null},
+  mind:{el:document.getElementById('pane-mind'), pz:null, rendered:false, src:null, tree:null}
+};
+let current='sys';
+
+function attachPanZoom(pane){
+  const svg = pane.el.querySelector('svg');
+  if(!svg) return;
+  svg.removeAttribute('height'); svg.style.maxWidth='none';
+  svg.setAttribute('width','100%'); svg.setAttribute('height','100%');
+  pane.pz = svgPanZoom(svg, {
+    zoomEnabled:true, controlIconsEnabled:false, fit:true, center:true,
+    minZoom:0.2, maxZoom:12, zoomScaleSensitivity:0.35
+  });
+}
+
+async function renderSys(){
+  const p = panes.sys;
+  p.src = await loadMmd('system_architecture.mmd', SYS_FALLBACK);
+  try{
+    const {svg} = await mermaid.render('svg-sys', p.src);
+    p.el.innerHTML = svg;
+  }catch(e){ p.el.innerHTML = '<div class="err">系統圖渲染失敗：'+e.message+'</div>'; return; }
+  attachPanZoom(p); p.rendered=true;
+}
+
+async function renderMind(){
+  const p = panes.mind;
+  p.src = await loadMmd('mindmap.mmd', MIND_FALLBACK);
+  p.tree = parseMindTree(p.src);
+  const hint = p.el.querySelector('.mm-hint');
+  try{
+    const {svg} = await mermaid.render('svg-mind', p.src);
+    p.el.innerHTML = svg;
+    if(hint) p.el.appendChild(hint);
+  }catch(e){ p.el.innerHTML = '<div class="err">思維導圖渲染失敗：'+e.message+'</div>'; if(hint) p.el.appendChild(hint); return; }
+  attachPanZoom(p);
+  wireMindInteraction();
+  p.rendered=true;
+}
+
+/* ---------- parse .mmd mindmap into parent/child tree by indentation ---------- */
+function normLabel(s){
+  return (s||'').replace(/[\s　]+/g,'').replace(/[(){}\[\]\/_·.,:、，。]/g,'').toLowerCase();
+}
+function stripSyntax(line){
+  // remove leading mindmap shape wrappers like ((x)) [x] (x)
+  let t = line.trim();
+  t = t.replace(/^root\b/i,'');
+  t = t.replace(/^\(\(+/,'').replace(/\)\)+$/,'');
+  t = t.replace(/^\(+/,'').replace(/\)+$/,'');
+  t = t.replace(/^\[+/,'').replace(/\]+$/,'');
+  return t.trim();
+}
+function parseMindTree(src){
+  const lines = src.split('\n').filter(l=>l.trim().length && !/^\s*mindmap\s*$/.test(l) && !/^\s*%%/.test(l));
+  const nodes=[]; const stack=[]; let rootId=null; let id=0;
+  for(const raw of lines){
+    if(/^\s*mindmap/.test(raw)) continue;
+    const indent = raw.match(/^\s*/)[0].replace(/\t/g,'  ').length;
+    const label = stripSyntax(raw);
+    if(!label) continue;
+    const node={id:id++, label, norm:normLabel(label), indent, parent:null, children:[]};
+    while(stack.length && stack[stack.length-1].indent>=indent) stack.pop();
+    if(stack.length){ node.parent=stack[stack.length-1].id; stack[stack.length-1].children.push(node.id); }
+    else { rootId=node.id; }
+    nodes.push(node); stack.push(node);
+  }
+  return {nodes, rootId, byId:Object.fromEntries(nodes.map(n=>[n.id,n]))};
+}
+function ancestorsOf(tree,nid){ const out=[]; let n=tree.byId[nid]; while(n && n.parent!=null){ out.push(n.parent); n=tree.byId[n.parent]; } return out; }
+function descendantsOf(tree,nid){ const out=[]; const st=[...(tree.byId[nid].children||[])]; while(st.length){ const c=st.pop(); out.push(c); st.push(...(tree.byId[c].children||[])); } return out; }
+
+/* ---------- mind map interaction ---------- */
+let mmEls=[]; // {g, node, bbox}
+function wireMindInteraction(){
+  const p = panes.mind;
+  const svg = p.el.querySelector('svg');
+  if(!svg) return;
+  const gNodes = Array.from(svg.querySelectorAll('g.mindmap-node'));
+  // map svg node -> tree node by normalized label
+  const used = new Set();
+  mmEls = gNodes.map(g=>{
+    const txt = normLabel(g.textContent||'');
+    let match=null;
+    for(const n of p.tree.nodes){
+      if(used.has(n.id)) continue;
+      if(n.norm===txt){ match=n; break; }
+    }
+    if(!match){ for(const n of p.tree.nodes){ if(used.has(n.id))continue; if(txt && (n.norm.includes(txt)||txt.includes(n.norm))){ match=n; break; } } }
+    if(match) used.add(match.id);
+    return {g, node:match};
+  }).filter(x=>x.node);
+
+  gNodes.forEach(g=>{
+    g.style.cursor='pointer';
+    g.addEventListener('click', ev=>{ ev.stopPropagation(); const e=mmEls.find(x=>x.g===g); if(e) focusNode(p.tree, e.node.id); });
+  });
+  svg.addEventListener('click', ()=>resetMind());
+}
+
+function clearMindClasses(){
+  const svg = panes.mind.el.querySelector('svg'); if(!svg) return;
+  svg.querySelectorAll('.mm-focus,.mm-anc,.mm-desc,.mm-dim').forEach(el=>el.classList.remove('mm-focus','mm-anc','mm-desc','mm-dim'));
+  svg.querySelectorAll('.edge-dim,.edge-anc,.edge-desc').forEach(el=>el.classList.remove('edge-dim','edge-anc','edge-desc'));
+  document.querySelectorAll('#nav button.mm-related').forEach(b=>b.classList.remove('mm-related'));
+}
+function resetMind(){ clearMindClasses(); }
+
+function bboxOf(g){ try{ const b=g.getBBox(); const m=g.getCTM(); if(!m) return null;
+  // transform to svg root coords using getBoundingClientRect relative to svg
+  const r=g.getBoundingClientRect(); return r; }catch(e){ return null; } }
+
+function focusNode(tree, nid){
+  clearMindClasses();
+  const svg = panes.mind.el.querySelector('svg');
+  const anc = new Set(ancestorsOf(tree,nid));
+  const desc = new Set(descendantsOf(tree,nid));
+  const roleById = {}; // id -> 'focus'|'anc'|'desc'
+  roleById[nid]='focus'; anc.forEach(i=>roleById[i]='anc'); desc.forEach(i=>roleById[i]='desc');
+
+  mmEls.forEach(e=>{
+    const role = roleById[e.node.id];
+    if(role==='focus') e.g.classList.add('mm-focus');
+    else if(role==='anc') e.g.classList.add('mm-anc');
+    else if(role==='desc') e.g.classList.add('mm-desc');
+    else e.g.classList.add('mm-dim');
+  });
+
+  // edge classification by endpoint bbox membership
+  const rects = mmEls.filter(e=>roleById[e.node.id]).map(e=>({role:roleById[e.node.id], r:e.g.getBoundingClientRect()}));
+  const TOL=6;
+  const hit=(x,y)=>{ for(const o of rects){ const r=o.r; if(x>=r.left-TOL&&x<=r.right+TOL&&y>=r.top-TOL&&y<=r.bottom+TOL) return o.role; } return null; };
+  const edges = Array.from(svg.querySelectorAll('path.edge, .edge, g.edges path, path')).filter(pt=>{
+    const d=pt.getAttribute('d'); return d && /[MmLlCcQq]/.test(d) && !pt.closest('g.mindmap-node');
+  });
+  edges.forEach(pt=>{
+    let pts;
+    try{ const L=pt.getTotalLength(); const a=pt.getPointAtLength(0); const b=pt.getPointAtLength(L);
+      const sa=svg.createSVGPoint(); // convert user-space to client
+      const m=pt.getScreenCTM(); if(!m){ pt.classList.add('edge-dim'); return; }
+      const pa={x:a.x*m.a+a.y*m.c+m.e, y:a.x*m.b+a.y*m.d+m.f};
+      const pb={x:b.x*m.a+b.y*m.c+m.e, y:b.x*m.b+b.y*m.d+m.f};
+      pts=[hit(pa.x,pa.y), hit(pb.x,pb.y)];
+    }catch(e){ pt.classList.add('edge-dim'); return; }
+    const [r1,r2]=pts;
+    const ok=v=>v==='anc'||v==='focus'||v==='desc';
+    if(ok(r1)&&ok(r2)){
+      const hasAnc=r1==='anc'||r2==='anc'; const hasDesc=r1==='desc'||r2==='desc';
+      if(hasAnc&&!hasDesc) pt.classList.add('edge-anc');
+      else if(hasDesc&&!hasAnc) pt.classList.add('edge-desc');
+      else pt.classList.add('edge-dim');
+    } else pt.classList.add('edge-dim');
+  });
+
+  // branch -> tab linkage (top-level branch = parent===rootId)
+  let branchId = nid;
+  if(nid!==tree.rootId){
+    let n=tree.byId[nid];
+    while(n && n.parent!=null && n.parent!==tree.rootId){ n=tree.byId[n.parent]; }
+    if(n && n.parent===tree.rootId) branchId=n.id;
+    else if(tree.byId[nid].parent===tree.rootId) branchId=nid;
+  }
+  const branch = tree.byId[branchId];
+  if(branch && branch.parent===tree.rootId){
+    const emo = leadingEmoji(branch.label);
+    if(emo){
+      document.querySelectorAll('#nav button').forEach(b=>{
+        if(leadingEmoji(b.textContent)===emo) b.classList.add('mm-related');
+      });
+    }
+  }
+}
+function leadingEmoji(s){
+  if(!s) return null;
+  const m = s.trim().match(/^(\p{Extended_Pictographic}️?)/u);
+  return m? m[1].replace('️','') : null;
+}
+
+/* ---------- tabs ---------- */
+async function showTab(tab){
+  current=tab;
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  document.querySelectorAll('#nav button.mm-related').forEach(b=>b.classList.remove('mm-related'));
+  Object.entries(panes).forEach(([k,p])=>p.el.classList.toggle('active', k===tab));
+  const p = panes[tab];
+  if(!p.rendered){ if(tab==='sys') await renderSys(); else await renderMind(); }
+  setTimeout(()=>{ if(p.pz){ p.pz.resize(); p.pz.fit(); p.pz.center(); } }, 60);
+}
+document.querySelectorAll('#nav button').forEach(b=> b.addEventListener('click', ()=>showTab(b.dataset.tab)));
+
+document.getElementById('zin').addEventListener('click', ()=>panes[current].pz && panes[current].pz.zoomIn());
+document.getElementById('zout').addEventListener('click', ()=>panes[current].pz && panes[current].pz.zoomOut());
+document.getElementById('zfit').addEventListener('click', ()=>{ const p=panes[current].pz; if(p){p.resize();p.fit();p.center();} });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && current==='mind') resetMind(); });
+window.addEventListener('resize', ()=>{ const p=panes[current].pz; if(p){p.resize();p.fit();p.center();} });
+
+/* boot */
+renderSys();
+</script>
+</body>
+</html>
