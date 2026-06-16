@@ -74,11 +74,18 @@ function route_(action, d){
   }
 }
 function doGet(e){
+  var p = (e && e.parameter) || {};
+  var out;
   try{
-    var p = (e && e.parameter) || {};
     var d = p.d ? JSON.parse(p.d) : {};
-    return route_(p.action, d);
-  }catch(err){ return json_({ok:false,error:String(err)}); }
+    out = route_(p.action, d);
+  }catch(err){ out = json_({ok:false,error:String(err)}); }
+  // JSONP：前端用 <script> 載入（跨瀏覽器最穩），把 JSON 包成 callback(...)
+  if(p.callback){
+    return ContentService.createTextOutput(p.callback + '(' + out.getContent() + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return out;
 }
 function doPost(e){
   try{
