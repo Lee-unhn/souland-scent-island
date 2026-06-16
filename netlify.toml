@@ -2,3 +2,13 @@
 [build]
   publish = "public"
   command = ""
+
+# 永遠拿最新的 html/js（避免瀏覽器拿到舊版 config 造成「連線錯誤」）
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "no-cache"
