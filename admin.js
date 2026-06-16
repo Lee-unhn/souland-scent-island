@@ -49,8 +49,9 @@ function logout(){ localStorage.removeItem(TKEY); TOKEN=''; showLogin(); }
 const LIVE = () => window.SOULAND_NET && SOULAND_NET.live();
 async function loadList(){
   try{
-    // 部署模式：品牌由 Google Sheet 維護，後台只讀；本機模式：可 CRUD
-    const j = LIVE() ? await SOULAND_NET.get('brandsPublic') : await api('/api/admin/brands',{headers:authHeaders()});
+    // 部署模式用 brandList（含未公開、需 token）；本機用 Express
+    const j = LIVE() ? await SOULAND_NET.post('brandList',{token:TOKEN}) : await api('/api/admin/brands',{headers:authHeaders()});
+    if(j && j.ok===false && /授權|逾時/.test(j.error||'')){ logout(); toast('登入逾時，請重新登入'); return; }
     BRANDS=(j&&j.brands)||[];
     renderList();
   }catch(e){ /* 401 已處理 */ }
@@ -58,24 +59,19 @@ async function loadList(){
 function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function renderList(){
   $('count').textContent='（共 '+BRANDS.length+' 家）';
-  const ro = LIVE();  // 部署模式 = 品牌走 Google Sheet，後台唯讀
-  // 新增按鈕：部署模式改成「到 Sheet 編輯」
   const addBtn = document.querySelector('#view-brands .bar .btn-p');
-  if(addBtn){
-    if(ro){ addBtn.textContent='在 Google Sheet 編輯品牌 ↗'; addBtn.onclick=()=>{ const u=(window.SOULAND_CONFIG||{}).BRANDS_SHEET_URL; if(u) window.open(u,'_blank'); else toast('品牌資料於 Google Sheet 維護'); }; }
-    else { addBtn.textContent='＋ 新增參展廠商'; addBtn.onclick=()=>openEditor(); }
-  }
+  if(addBtn){ addBtn.textContent='＋ 新增參展廠商'; addBtn.onclick=()=>openEditor(); }
   const box=$('list');
-  const note = ro ? '<p class="reg-note">部署模式：品牌名單由 Google Sheet 維護，這裡為唯讀預覽。改/增品牌請編輯參展品牌 Sheet。</p>' : '';
-  if(!BRANDS.length){ box.innerHTML=note+'<div class="empty">尚無參展廠商資料。'+(ro?'請在參展品牌 Google Sheet 新增。':'點右上「＋ 新增參展廠商」開始建立。')+'</div>'; return; }
-  box.innerHTML=note+'<table><thead><tr><th>品牌</th><th>類型</th><th>產地</th><th>攤位</th><th>狀態</th><th></th></tr></thead><tbody>'+
+  if(!BRANDS.length){ box.innerHTML='<div class="empty">尚無參展廠商資料。點右上「＋ 新增參展廠商」開始建立（會寫入 Google Sheet，並同步顯示在官網「參展品牌」頁）。</div>'; return; }
+  box.innerHTML='<table><thead><tr><th>品牌</th><th>類型</th><th>產地</th><th>攤位</th><th>狀態</th><th></th></tr></thead><tbody>'+
     BRANDS.map(b=>'<tr>'+
       '<td><b>'+esc(b.name)+'</b>'+(b.en?'<br><small style="color:#8a8170">'+esc(b.en)+'</small>':'')+'</td>'+
       '<td>'+esc(b.type||'—')+'</td><td>'+esc(b.country||'—')+'</td><td>'+esc(b.booth||'—')+'</td>'+
       '<td><span class="pill '+(b.published!==false?'on':'off')+'">'+(b.published!==false?'已公開':'未公開')+'</span></td>'+
-      '<td><div class="acts">'+(ro?'<span style="color:#8a8170;font-size:.82rem">Sheet 編輯</span>':
+      '<td><div class="acts">'+
         '<button class="btn btn-g btn-s" onclick="openEditor(\''+b.id+'\')">編輯</button>'+
-        '<button class="btn btn-d btn-s" onclick="delBrand(\''+b.id+'\',\''+esc(b.name).replace(/\'/g,"")+'\')">刪除</button>')+'</div></td>'+
+        '<button class="btn btn-d btn-s" onclick="delBrand(\''+b.id+'\',\''+esc(b.name).replace(/\'/g,"")+'\')">刪除</button>'+
+      '</div></td>'+
       '</tr>').join('')+'</tbody></table>';
 }
 
@@ -110,7 +106,6 @@ function collectProds(){
   })).filter(p=>p.name);
 }
 async function saveBrand(btn){
-  if(LIVE()){ toast('部署模式：品牌請至 Google Sheet 編輯'); closeEditor(); return; }
   const payload={
     name:$('m-name').value.trim(), en:$('m-en').value.trim(),
     type:$('m-type').value, country:$('m-country').value.trim(), booth:$('m-booth').value.trim(),
@@ -122,19 +117,22 @@ async function saveBrand(btn){
   const id=$('m-id').value;
   btn.disabled=true; btn.textContent='儲存中…';
   try{
-    const j=await api(id?'/api/admin/brands/'+id:'/api/admin/brands',
-      { method:id?'PUT':'POST', headers:authHeaders({'Content-Type':'application/json'}), body:JSON.stringify(payload) });
+    const j = LIVE()
+      ? await SOULAND_NET.post('brandSave', Object.assign({token:TOKEN, id:id||''}, payload))
+      : await api(id?'/api/admin/brands/'+id:'/api/admin/brands', { method:id?'PUT':'POST', headers:authHeaders({'Content-Type':'application/json'}), body:JSON.stringify(payload) });
     if(!j.ok){ toast(j.error||'儲存失敗'); return; }
     toast(id?'已更新':'已新增'); closeEditor(); loadList();
-  }catch(e){ /* 401 handled */ }
+  }catch(e){ toast('儲存錯誤：'+((e&&e.message)||e)); }
   finally{ btn.disabled=false; btn.textContent='儲存'; }
 }
 async function delBrand(id,name){
   if(!confirm('確定刪除「'+name+'」？此動作無法復原。')) return;
   try{
-    const j=await api('/api/admin/brands/'+id,{method:'DELETE',headers:authHeaders()});
+    const j = LIVE()
+      ? await SOULAND_NET.post('brandDelete', {token:TOKEN, id})
+      : await api('/api/admin/brands/'+id,{method:'DELETE',headers:authHeaders()});
     if(j.ok){ toast('已刪除'); loadList(); } else toast(j.error||'刪除失敗');
-  }catch(e){}
+  }catch(e){ toast('刪除錯誤：'+((e&&e.message)||e)); }
 }
 $('mask').addEventListener('click',e=>{ if(e.target===$('mask')) closeEditor(); });
 
