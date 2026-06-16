@@ -7,10 +7,10 @@ window.SOULAND_CONFIG = {
   /* ── 1. 後端：Apps Script Web App（部署/GitHub Pages 用）──────────────
      貼上 apps-script/Code.gs 部署後的 /exec 網址。填了 = 全站走 Apps Script
      （報名 / 後台 / 品牌 / 工作坊…）。留空 = 走本機 Express /api/*（npm start）。 */
-  APPS_SCRIPT_URL: "",   // 例:https://script.google.com/macros/s/AKfycb..../exec
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwn5y1zWLQecQAFksHPLVvpS29KRjyZf5JVNxYXAnR_RKNcvc7UU3CytxuCl-52_TeF5g/exec",
 
   REGISTER_ENDPOINT: "/api/register",          // 本機 Express 用（APPS_SCRIPT_URL 留空時）
-  BRANDS_SHEET_URL: "",                         // 參展品牌 Google Sheet 編輯網址（後台「到 Sheet 編輯」按鈕用）
+  BRANDS_SHEET_URL: "https://docs.google.com/spreadsheets/d/13UU6vBLE0S-tpJDwLMVD9UrgmAChmMkx1ff7SwuDbeQ/edit",  // 後台「到 Sheet 編輯」按鈕
 
   /* ── 3. 購票連結跳轉 ───────────────────────────────────────────────  */
   TICKET_URL: "",        // 留空 → 顯示「購票 8 月開放」
