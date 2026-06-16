@@ -38,7 +38,7 @@ async function doLogin(){
                    : await (await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})})).json();
     if(!j.ok){ $('l-err').textContent=j.error||'登入失敗'; return; }
     TOKEN=j.token; localStorage.setItem(TKEY,TOKEN); showApp(j.user);
-  }catch(e){ $('l-err').textContent='連線錯誤，請確認後端已啟動 / 網路'; }
+  }catch(e){ $('l-err').textContent='連線錯誤：'+((e&&e.message)||e); }
   finally{ btn.disabled=false; btn.textContent='登入'; }
 }
 $('l-pass').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });

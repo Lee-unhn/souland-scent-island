@@ -58,26 +58,33 @@ function verify_(token){
 
 var REG_HEADERS = ['時間','單號','狀態','公司名稱(中)','公司名稱(英)','品牌名稱(中)','品牌名稱(英)','平面圖顯示名稱','統一編號','公司地址','郵遞區號','展覽聯絡人','公司負責人','電話','手機','Email','公司網站','IG帳號','Facebook','品牌創立年份','主要產地','參展品類','攤位方案','攤位數量','計價別','單價','攤位費小計','保證金','簽約應繳','備註'];
 
-/* ============================================================ doPost */
+/* ============================================================ 路由
+   前端統一走 GET（?action=X&d=<JSON>），跨來源最穩。doPost 保留相容。 */
+function route_(action, d){
+  switch(action){
+    case 'register':     return doRegister_(d);
+    case 'workshop':     return doSimple_('workshop', d);
+    case 'buyer':        return doSimple_('buyer', d);
+    case 'contact':      return doSimple_('contact', d);
+    case 'adminLogin':   return doLogin_(d);
+    case 'adminRegs':    return doAdminRegs_(d);
+    case 'regStatus':    return doRegStatus_(d);
+    case 'brandsPublic': return brandsPublic_();
+    default:             return json_({ok:true,msg:'SOULAND endpoint alive ✦'});
+  }
+}
+function doGet(e){
+  try{
+    var p = (e && e.parameter) || {};
+    var d = p.d ? JSON.parse(p.d) : {};
+    return route_(p.action, d);
+  }catch(err){ return json_({ok:false,error:String(err)}); }
+}
 function doPost(e){
   try{
     var d = JSON.parse(e.postData.contents);
-    switch(d.action){
-      case 'register':   return doRegister_(d);
-      case 'workshop':   return doSimple_('workshop', d);
-      case 'buyer':      return doSimple_('buyer', d);
-      case 'contact':    return doSimple_('contact', d);
-      case 'adminLogin': return doLogin_(d);
-      case 'adminRegs':  return doAdminRegs_(d);
-      case 'regStatus':  return doRegStatus_(d);
-      default:           return json_({ok:false,error:'未知 action'});
-    }
+    return route_(d.action, d);
   }catch(err){ return json_({ok:false,error:String(err)}); }
-}
-function doGet(e){
-  var a = e && e.parameter && e.parameter.action;
-  if(a==='brandsPublic') return brandsPublic_();
-  return json_({ok:true,msg:'SOULAND endpoint alive ✦'});
 }
 
 /* ---------- 報名 ---------- */
