@@ -139,12 +139,13 @@ $('mask').addEventListener('click',e=>{ if(e.target===$('mask')) closeEditor(); 
 /* ---------- 報名管理（= 報名回寫 Sheet 的同一份資料）---------- */
 const REG_STATUSES=[['pending_remit','待匯款'],['remitted','已匯款'],['reviewing','審核中'],['approved','審核通過'],['payment_failed','付款失敗']];
 function switchTab(which){
-  ['brands','regs','layout'].forEach(t=>{
+  ['brands','regs','layout','text'].forEach(t=>{
     const v=$('view-'+t); if(v) v.style.display=(t===which)?'block':'none';
     const b=$('tab-'+t); if(b) b.classList.toggle('on', t===which);
   });
   if(which==='regs') loadRegs();
   if(which==='layout') loadLayout();
+  if(which==='text') loadText();
 }
 async function loadRegs(){
   try{
@@ -221,6 +222,63 @@ async function saveLayout(btn){
     if(j.ok) toast('已儲存，官網重整即套用'); else toast(j.error||'儲存失敗');
   }catch(e){ toast('儲存錯誤：'+((e&&e.message)||e)); }
   finally{ btn.disabled=false; btn.textContent='儲存並套用到官網'; }
+}
+
+/* ---------- 文案編輯（全站文字：原文 → 新文字，寫回文案 Sheet）---------- */
+let TEXTROWS=[];
+async function loadText(){
+  const box=$('textBox');
+  box.innerHTML='<div class="empty">載入中…</div>';
+  try{
+    const j = LIVE() ? await SOULAND_NET.post('textList',{token:TOKEN}) : {ok:false,error:'本機模式不支援文案'};
+    if(j && j.ok===false && /授權|逾時/.test(j.error||'')){ logout(); toast('登入逾時，請重新登入'); return; }
+    if(!j || !j.ok){ box.innerHTML='<div class="empty">無法載入文案：'+esc((j&&j.error)||'未設定 SHEET_TEXT（請在 Apps Script 設定屬性並重新部署）')+'</div>'; return; }
+    TEXTROWS=j.items||[];
+    renderText();
+  }catch(e){ box.innerHTML='<div class="empty">載入錯誤：'+esc((e&&e.message)||e)+'</div>'; }
+}
+function renderText(){
+  $('textCount').textContent='（共 '+TEXTROWS.length+' 段）';
+  if(!TEXTROWS.length){ $('textBox').innerHTML='<div class="empty">文案 Sheet 沒有資料，或尚未設定 SHEET_TEXT。</div>'; return; }
+  $('textBox').innerHTML='<div class="text-list">'+TEXTROWS.map(r=>
+    '<div class="text-row" data-row="'+r.row+'" data-from="'+esc(r.from)+'" data-page="'+esc(r.page)+'">'+
+      '<div class="text-orig"><span class="text-pg">'+esc(r.page)+'</span>'+esc(r.from)+'</div>'+
+      '<input class="text-new" type="text" value="'+esc(r.to||'')+'" data-orig="'+esc(r.to||'')+'" placeholder="（留空＝維持原文）" oninput="markEdited(this)">'+
+    '</div>').join('')+'</div>';
+}
+function markEdited(inp){
+  const row=inp.closest('.text-row');
+  if(row) row.classList.toggle('edited', inp.value!==inp.getAttribute('data-orig'));
+}
+function filterText(q){
+  q=(q||'').trim().toLowerCase();
+  const only=$('textOnlyEdited') && $('textOnlyEdited').checked;
+  document.querySelectorAll('#textBox .text-row').forEach(row=>{
+    const hay=(row.getAttribute('data-from')+' '+row.getAttribute('data-page')).toLowerCase();
+    const inp=row.querySelector('.text-new');
+    const matchQ = !q || hay.indexOf(q)>=0;
+    const matchEdited = !only || (inp && inp.value.trim()!=='');
+    row.style.display=(matchQ && matchEdited)?'':'none';
+  });
+}
+async function saveText(btn){
+  const items=[];
+  document.querySelectorAll('#textBox .text-new').forEach(inp=>{
+    if(inp.value!==inp.getAttribute('data-orig')){
+      items.push({ row:Number(inp.closest('.text-row').getAttribute('data-row')), to:inp.value });
+    }
+  });
+  if(!items.length){ toast('沒有變更'); return; }
+  btn.disabled=true; btn.textContent='儲存中…';
+  try{
+    const j = LIVE() ? await SOULAND_NET.post('textSave',{token:TOKEN,items}) : {ok:false,error:'本機模式不支援文案儲存'};
+    if(j && j.ok){
+      // 更新基準值，清除 edited 標記
+      document.querySelectorAll('#textBox .text-new').forEach(inp=>{ inp.setAttribute('data-orig',inp.value); inp.closest('.text-row').classList.remove('edited'); });
+      toast('已儲存 '+items.length+' 段，官網重整即套用');
+    } else toast((j&&j.error)||'儲存失敗');
+  }catch(e){ toast('儲存錯誤：'+((e&&e.message)||e)); }
+  finally{ btn.disabled=false; btn.textContent='儲存變更並套用到官網'; }
 }
 
 /* ---------- 啟動：驗證既有 token ---------- */
