@@ -12,3 +12,7 @@ public/_legacy_singlepage/
 public/assets/logo-kraft.jpg
 public/assets/poster-island.jpg
 public/assets/pv-03.jpg
+public/assets/souland-prospectus.pdf
+
+# Pages workflow（OAuth 無 workflow scope，改用 gh-pages 分支部署；本機保留供參考）
+.github/

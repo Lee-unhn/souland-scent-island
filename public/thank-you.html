@@ -56,10 +56,13 @@
       +(order?'　|　報名單號:<b>'+order+'</b>':'');
   }
 
-  // 簡章下載
+  // 簡章下載（PDF 放 Google Drive，外連新分頁；未設定則隱藏）
   const dl=document.getElementById('dlBtn');
-  dl.href=c.PROSPECTUS_URL||'assets/souland-prospectus.pdf';
-  if(c.PROSPECTUS_NAME) dl.setAttribute('download', c.PROSPECTUS_NAME);
+  if(c.PROSPECTUS_URL){
+    dl.href=c.PROSPECTUS_URL; dl.target='_blank'; dl.rel='noopener'; dl.removeAttribute('download');
+  } else {
+    dl.style.display='none';
+  }
 
   const p=c.PAYMENT||{};
   const box=document.getElementById('payBox');

@@ -15,8 +15,10 @@ window.SOULAND_CONFIG = {
   /* ── 3. 購票連結跳轉 ───────────────────────────────────────────────  */
   TICKET_URL: "",        // 留空 → 顯示「購票 8 月開放」
 
-  /* ── 4. 報名完成頁要下載的招商簡章 PDF ─────────────────────────────  */
-  PROSPECTUS_URL: "assets/souland-prospectus.pdf",
+  /* ── 4. 報名完成頁的招商簡章 PDF（放 Google Drive，超連結下載）─────────
+     把 PDF 上傳到 Drive → 共用設「知道連結的任何人皆可檢視」→ 貼檢視連結。
+     例:https://drive.google.com/file/d/<檔案ID>/view                       */
+  PROSPECTUS_URL: "",   // 留空 = 報名完成頁不顯示下載鈕
   PROSPECTUS_NAME: "嗅覺島SOULAND2026_招商簡章.pdf",
 
   /* ── 5. 繳費方式 ───────────────────────────────────────────────────
