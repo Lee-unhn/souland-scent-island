@@ -73,6 +73,8 @@ function route_(action, d){
     case 'brandList':    return brandList_(d);
     case 'brandSave':    return brandSave_(d);
     case 'brandDelete':  return brandDelete_(d);
+    case 'layoutGet':    return layoutGet_();
+    case 'layoutSave':   return layoutSave_(d);
     default:             return json_({ok:true,msg:'SOULAND endpoint alive ✦'});
   }
 }
@@ -207,5 +209,32 @@ function brandDelete_(d){
   if(!verify_(d.token)) return json_({ok:false,error:'未授權或逾時'});
   if(!d.id) return json_({ok:false,error:'缺少 id'});
   var sh = brandSheet_(); sh.deleteRow(Number(d.id));
+  return json_({ok:true});
+}
+
+/* ---------- 版面設定（首頁區塊顯示/排序 + 導覽/購票/報名開關）----------
+   存 Script Properties 'LAYOUT'（JSON）。layoutGet 公開（前台載入用）。 */
+var DEFAULT_LAYOUT = {
+  sections: [
+    { key:'stats',      visible:true },
+    { key:'awaken',     visible:true },
+    { key:'highlights', visible:true },
+    { key:'awards',     visible:true },
+    { key:'schedule',   visible:true }
+  ],
+  nav: { about:true, visit:true, experience:true, brands:true, awards:true },
+  ticket: true,
+  register: true
+};
+function layoutGet_(){
+  var raw = P('LAYOUT');
+  var lay = DEFAULT_LAYOUT;
+  if(raw){ try{ lay = JSON.parse(raw); }catch(e){} }
+  return json_({ ok:true, layout:lay });
+}
+function layoutSave_(d){
+  if(!verify_(d.token)) return json_({ok:false,error:'未授權或逾時'});
+  if(!d.layout) return json_({ok:false,error:'缺少 layout'});
+  SP.setProperty('LAYOUT', JSON.stringify(d.layout));
   return json_({ok:true});
 }

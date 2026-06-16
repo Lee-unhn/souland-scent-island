@@ -70,6 +70,17 @@
   .st-sel{font-family:inherit;font-size:.84rem;padding:.32rem .5rem;border:1px solid var(--line);border-radius:7px;background:#fff;cursor:pointer}
   .reg-amt{font-family:'Cormorant Garamond',serif;color:var(--navy);white-space:nowrap}
   td.reg-brand b{color:var(--navy)} td.reg-brand small{color:#8a8170}
+  .lay-group{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:16px}
+  .lay-group h4{font-family:'Noto Serif TC',serif;color:var(--navy);margin-bottom:6px;font-size:1rem}
+  .lay-group .hint2{font-size:.8rem;color:#8a8170;margin-bottom:8px}
+  .lay-row{display:flex;align-items:center;gap:12px;padding:9px 2px;border-bottom:1px dashed var(--line)}
+  .lay-row:last-child{border-bottom:none}
+  .lay-row .nm{flex:1;color:var(--ink);font-size:.95rem}
+  .lay-row .ord{display:flex;gap:4px}
+  .lay-row .ord button{width:30px;height:30px;border:1px solid var(--line);background:#fff;border-radius:7px;cursor:pointer;color:var(--navy);font-size:.95rem}
+  .lay-row .ord button:disabled{opacity:.3;cursor:default}
+  .lay-row .vis{display:inline-flex;align-items:center;gap:6px;font-size:.86rem;color:#5a5142;cursor:pointer}
+  .lay-row .vis input{width:auto;accent-color:var(--navy)}
 
   /* editor modal */
   .mask{position:fixed;inset:0;background:rgba(29,51,73,.55);display:none;place-items:center;padding:20px;z-index:50;overflow:auto}
@@ -121,6 +132,7 @@
     <div class="tabs">
       <button class="tab on" id="tab-brands" onclick="switchTab('brands')">參展廠商</button>
       <button class="tab" id="tab-regs" onclick="switchTab('regs')">報名管理</button>
+      <button class="tab" id="tab-layout" onclick="switchTab('layout')">版面設定</button>
     </div>
 
     <div id="view-brands">
@@ -138,6 +150,15 @@
       </div>
       <p class="reg-note">此處即「報名回寫 Google Sheet」的同一份資料。改狀態會同步回寫 Sheet 狀態欄。</p>
       <div id="regList"></div>
+    </div>
+
+    <div id="view-layout" style="display:none">
+      <div class="bar">
+        <h2>版面設定</h2>
+        <button class="btn btn-p" id="layoutSaveBtn" onclick="saveLayout(this)">儲存並套用到官網</button>
+      </div>
+      <p class="reg-note">控制官網首頁區塊的「顯示/隱藏」與「上下排序」，以及導覽列、購票、報名的開關。儲存後官網重整即同步。</p>
+      <div id="layoutBox"></div>
     </div>
   </div>
 </div>
@@ -189,7 +210,7 @@
   </div>
 </div>
 
-<script src="config.js?v=3"></script>
-<script src="admin.js?v=3"></script>
+<script src="config.js?v=4"></script>
+<script src="admin.js?v=4"></script>
 </body>
 </html>
