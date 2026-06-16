@@ -139,12 +139,12 @@ $('mask').addEventListener('click',e=>{ if(e.target===$('mask')) closeEditor(); 
 /* ---------- 報名管理（= 報名回寫 Sheet 的同一份資料）---------- */
 const REG_STATUSES=[['pending_remit','待匯款'],['remitted','已匯款'],['reviewing','審核中'],['approved','審核通過'],['payment_failed','付款失敗']];
 function switchTab(which){
-  const isB=which==='brands';
-  $('view-brands').style.display=isB?'block':'none';
-  $('view-regs').style.display=isB?'none':'block';
-  $('tab-brands').classList.toggle('on',isB);
-  $('tab-regs').classList.toggle('on',!isB);
-  if(!isB) loadRegs();
+  ['brands','regs','layout'].forEach(t=>{
+    const v=$('view-'+t); if(v) v.style.display=(t===which)?'block':'none';
+    const b=$('tab-'+t); if(b) b.classList.toggle('on', t===which);
+  });
+  if(which==='regs') loadRegs();
+  if(which==='layout') loadLayout();
 }
 async function loadRegs(){
   try{
@@ -176,6 +176,51 @@ async function updateRegStatus(orderId,status){
                      : await api('/api/admin/registrations/'+encodeURIComponent(orderId),{method:'PUT',headers:authHeaders({'Content-Type':'application/json'}),body:JSON.stringify({status})});
     if(j.ok) toast('狀態已更新'+(LIVE()?'（已回寫 Sheet）':'')); else toast(j.error||'更新失敗');
   }catch(e){}
+}
+
+/* ---------- 版面設定（首頁區塊顯示/排序 + 導覽/購票/報名）---------- */
+const SECTION_LABELS={stats:'展覽規模數據',awaken:'嗅覺五覺醒',highlights:'特色體驗',awards:'年度香氛大賞',schedule:'展期時間表'};
+const NAV_LABELS={about:'關於',visit:'展覽資訊',experience:'特色體驗',brands:'參展品牌',awards:'年度大賞'};
+let LAYOUT=null;
+function defaultLayout(){
+  return { sections:[{key:'stats',visible:true},{key:'awaken',visible:true},{key:'highlights',visible:true},{key:'awards',visible:true},{key:'schedule',visible:true}],
+    nav:{about:true,visit:true,experience:true,brands:true,awards:true}, ticket:true, register:true };
+}
+async function loadLayout(){
+  try{ const j = LIVE() ? await SOULAND_NET.get('layoutGet') : {ok:false};
+    LAYOUT = (j&&j.ok&&j.layout) ? j.layout : defaultLayout();
+  }catch(e){ LAYOUT = defaultLayout(); }
+  if(!LAYOUT.sections) LAYOUT.sections=defaultLayout().sections;
+  if(!LAYOUT.nav) LAYOUT.nav=defaultLayout().nav;
+  renderLayout();
+}
+function setSecVis(i,v){ LAYOUT.sections[i].visible=v; }
+function setNavVis(k,v){ LAYOUT.nav[k]=v; }
+function setFlag(k,v){ LAYOUT[k]=v; }
+function moveSection(i,dir){ const a=LAYOUT.sections,j=i+dir; if(j<0||j>=a.length) return; const t=a[i];a[i]=a[j];a[j]=t; renderLayout(); }
+function renderLayout(){
+  const L=LAYOUT;
+  const sec=L.sections.map((s,i)=>'<div class="lay-row"><div class="ord">'+
+    '<button onclick="moveSection('+i+',-1)" '+(i===0?'disabled':'')+'>↑</button>'+
+    '<button onclick="moveSection('+i+',1)" '+(i===L.sections.length-1?'disabled':'')+'>↓</button></div>'+
+    '<span class="nm">'+esc(SECTION_LABELS[s.key]||s.key)+'</span>'+
+    '<label class="vis"><input type="checkbox" '+(s.visible!==false?'checked':'')+' onchange="setSecVis('+i+',this.checked)"> 顯示</label></div>').join('');
+  const nav=Object.keys(NAV_LABELS).map(k=>'<div class="lay-row"><span class="nm">'+esc(NAV_LABELS[k])+'</span>'+
+    '<label class="vis"><input type="checkbox" '+(L.nav[k]!==false?'checked':'')+' onchange="setNavVis(\''+k+'\',this.checked)"> 顯示</label></div>').join('');
+  const glob='<div class="lay-row"><span class="nm">購票按鈕</span><label class="vis"><input type="checkbox" '+(L.ticket!==false?'checked':'')+' onchange="setFlag(\'ticket\',this.checked)"> 顯示</label></div>'+
+    '<div class="lay-row"><span class="nm">「我要參展」報名入口</span><label class="vis"><input type="checkbox" '+(L.register!==false?'checked':'')+' onchange="setFlag(\'register\',this.checked)"> 顯示</label></div>';
+  $('layoutBox').innerHTML='<div class="lay-group"><h4>首頁區塊</h4><div class="hint2">↑↓ 調整官網首頁區塊順序；取消勾選＝隱藏。</div>'+sec+'</div>'+
+    '<div class="lay-group"><h4>導覽列項目</h4>'+nav+'</div>'+
+    '<div class="lay-group"><h4>其他</h4>'+glob+'</div>';
+}
+async function saveLayout(btn){
+  if(!LAYOUT) return;
+  btn.disabled=true; btn.textContent='儲存中…';
+  try{
+    const j = LIVE() ? await SOULAND_NET.post('layoutSave',{token:TOKEN,layout:LAYOUT}) : {ok:false,error:'本機模式不支援版面儲存'};
+    if(j.ok) toast('已儲存，官網重整即套用'); else toast(j.error||'儲存失敗');
+  }catch(e){ toast('儲存錯誤：'+((e&&e.message)||e)); }
+  finally{ btn.disabled=false; btn.textContent='儲存並套用到官網'; }
 }
 
 /* ---------- 啟動：驗證既有 token ---------- */

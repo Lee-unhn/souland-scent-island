@@ -243,8 +243,32 @@ async function loadBrands(){
   renderAllocation();
 }
 
+/* ---- 套用後台「版面設定」：首頁區塊顯示/排序 + 導覽/購票/報名開關 ---- */
+async function applyLayout(){
+  if(!(window.SOULAND_NET && SOULAND_NET.live())) return;  // 無後端 → 維持原始版面
+  let cfg;
+  try{ const j = await SOULAND_NET.get('layoutGet'); if(!(j && j.ok && j.layout)) return; cfg = j.layout; }catch(e){ return; }
+  // 首頁區塊：依設定排序 + 顯示/隱藏
+  const home = document.getElementById('page-home');
+  if(home && Array.isArray(cfg.sections)){
+    cfg.sections.forEach(s=>{
+      const el = home.querySelector('[data-section="'+s.key+'"]');
+      if(!el) return;
+      el.style.display = (s.visible===false) ? 'none' : '';
+      home.appendChild(el);  // 移到設定順序（hero 之後）
+    });
+  }
+  // 導覽列項目
+  if(cfg.nav){ Object.keys(cfg.nav).forEach(k=>{ const b=document.getElementById('nav-'+k); if(b) b.style.display = (cfg.nav[k]===false)?'none':''; }); }
+  // 購票鈕
+  if(cfg.ticket===false){ document.querySelectorAll('[data-ticket],[data-ticket-foot]').forEach(el=>el.style.display='none'); }
+  // 我要參展 / 報名 CTA
+  if(cfg.register===false){ document.querySelectorAll('a[href="vendor.html"]').forEach(el=>el.style.display='none'); }
+}
+
 /* ---- init ---- */
 buildContours();
 tick(); setInterval(tick,1000);
 applyTicketUrl();
 loadBrands();
+applyLayout();
