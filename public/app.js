@@ -228,12 +228,17 @@ function submitContact(){ submitSimple('contact',{topic:document.getElementById(
 
 /* ---- 從後台讀取已發布的參展品牌（admin 後台維護）---- */
 async function loadBrands(){
+  let j = null;
   try{
-    const j = (window.SOULAND_NET && SOULAND_NET.live())
+    j = (window.SOULAND_NET && SOULAND_NET.live())
       ? await SOULAND_NET.get('brandsPublic')
       : await (await fetch('/api/brands')).json();
-    if(j && j.ok && Array.isArray(j.brands)){ BRANDS.length=0; BRANDS.push(...j.brands); }
-  }catch(e){ /* 後端未啟動時維持空陣列，顯示「陸續公布中」 */ }
+  }catch(e){ j = null; }
+  // 靜態站 fallback：無後端（GitHub Pages）時讀打包進站的 brands.json
+  if(!(j && j.ok && Array.isArray(j.brands) && j.brands.length)){
+    try{ const b = await (await fetch('brands.json',{cache:'no-store'})).json(); if(Array.isArray(b)) j = { ok:true, brands:b }; }catch(e){}
+  }
+  if(j && j.ok && Array.isArray(j.brands)){ BRANDS.length=0; BRANDS.push(...j.brands); }
   if(document.getElementById('page-brands')) Brands.render();
   renderAllocation();
 }
