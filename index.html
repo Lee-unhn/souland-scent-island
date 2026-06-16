@@ -171,11 +171,14 @@
       <div class="benefit"><small>Café</small><h3>咖啡與紀念品</h3><p>咖啡飲食攤與官方紀念品販售,逛累了的補給站。</p></div>
     </div>
 
-    <div class="sec-head" style="margin-top:clamp(46px,5vw,72px)">
-      <span class="sub-en">Booth Allocation</span><h2>展場分配</h2>
-      <p>各參展品牌依攤位區與品類配置（A·B·C·D 品牌展區、M 市集、S 供應鏈專區）。名單隨報名審核陸續更新，由主辦於後台 / Google Sheet 維護。點品牌可看介紹。</p>
+    <!-- 展場分配：暫時隱藏（之後要顯示就把下面這個 div 的 hidden 拿掉）-->
+    <div id="alloc-block" hidden>
+      <div class="sec-head" style="margin-top:clamp(46px,5vw,72px)">
+        <span class="sub-en">Booth Allocation</span><h2>展場分配</h2>
+        <p>各參展品牌依攤位區與品類配置（A·B·C·D 品牌展區、M 市集、S 供應鏈專區）。名單隨報名審核陸續更新，由主辦於後台 / Google Sheet 維護。點品牌可看介紹。</p>
+      </div>
+      <div id="allocation" class="alloc"></div>
     </div>
-    <div id="allocation" class="alloc"></div>
   </div></section>
   <section class="sec"><div class="wrap">
     <div class="sec-head"><span class="sub-en">Daily Schedule</span><h2>每日活動行事曆</h2></div>
