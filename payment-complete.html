@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>付款結果｜嗅覺島 SCENT ISLAND 2026</title>
+<title>付款結果｜嗅覺島 SOUL LAND 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
@@ -59,14 +59,14 @@
     root.classList.add('ok');
     document.getElementById('icon').textContent = '✓';
     document.getElementById('title').textContent = '報名與付款完成';
-    document.getElementById('desc').textContent = '感謝您報名嗅覺島 SCENT ISLAND 2026！款項已收訖，主辦單位將於 5–7 個工作天內完成審核並與您聯繫確認展位。';
+    document.getElementById('desc').textContent = '感謝您報名嗅覺島 SOUL LAND 2026！款項已收訖，主辦單位將於 5–7 個工作天內完成審核並與您聯繫確認展位。';
     document.getElementById('next').textContent = '確認信將寄至您填寫的電子郵件。期待與您共創香氛盛事。';
   } else if (status === 'fail') {
     root.classList.add('fail');
     document.getElementById('icon').textContent = '!';
     document.getElementById('title').textContent = '付款未完成';
     document.getElementById('desc').textContent = '本次付款未成功' + (msg ? '（' + msg + '）' : '') + '。您的報名資料已保留，可重新嘗試付款或與我們聯繫。';
-    document.getElementById('next').innerHTML = '聯絡：<a href="mailto:hello@scentisland.tw" style="color:var(--gold-deep)">hello@scentisland.tw</a>';
+    document.getElementById('next').innerHTML = '聯絡：<a href="mailto:Soulland@soullandtw.com" style="color:var(--gold-deep)">Soulland@soullandtw.com</a>';
   } else {
     root.classList.add('ok');
     document.getElementById('title').textContent = '感謝您的報名';
