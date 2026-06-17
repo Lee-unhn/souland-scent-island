@@ -257,6 +257,10 @@ async function applyLayout(){
       el.style.display = (s.visible===false) ? 'none' : '';
       home.appendChild(el);  // 移到設定順序（hero 之後）
     });
+    // 不在設定內的 data-section 區塊 → 一律排到最後（避免被上面 appendChild 推到前面）
+    home.querySelectorAll('[data-section]').forEach(el=>{
+      if(!cfg.sections.some(s=>s.key===el.dataset.section)) home.appendChild(el);
+    });
   }
   // 導覽列項目
   if(cfg.nav){ Object.keys(cfg.nav).forEach(k=>{ const b=document.getElementById('nav-'+k); if(b) b.style.display = (cfg.nav[k]===false)?'none':''; }); }
