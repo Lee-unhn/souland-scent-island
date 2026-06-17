@@ -46,12 +46,12 @@
     <div class="ty-next">
       <h4>接下來會發生什麼</h4>
       <div class="ty-step"><b>01</b><div>主辦單位將於 <b style="color:#284664;font-family:inherit">5–7 個工作天</b> 內以 Email 與您聯繫,確認品牌資料與展位。</div></div>
-      <div class="ty-step"><b>02</b><div>審核通過後簽署參展合約,並繳交攤位費 50% 訂金 + 保證金。</div></div>
-      <div class="ty-step"><b>03</b><div>確認展位位置與設計需求,展前一個月繳清尾款,10/28–10/29 進場佈展。</div></div>
+      <div class="ty-step"><b>02</b><div>審核通過後簽署參展合約,一次繳清攤位費全額與保證金。</div></div>
+      <div class="ty-step"><b>03</b><div>確認展位位置與設計需求,10/29 進場佈展。</div></div>
     </div>
 
     <div class="ty-pay" id="payBox">
-      <b>繳費方式｜報名審核後匯款</b>　審核通過後，主辦單位將以 Email 提供匯款帳號，請依通知完成訂金與保證金匯款。
+      <b>繳費方式｜報名審核後匯款</b>　審核通過後，主辦單位將以 Email 提供匯款帳號，請依通知一次付清攤位費與保證金。
     </div>
     <div id="ecpayMount" style="display:none"></div>
   </div>
@@ -88,7 +88,7 @@
     // （保留）線上金流：未來把 PAYMENT.ENABLED 改回 true 即啟用
     const modeTag = p.MODE==='STAGE-TEST' ? '（測試環境・不會真實扣款）' : '';
     box.innerHTML =
-      '<b>線上繳交訂金 + 保證金</b>　應繳 <b style="color:#284664">'+fmt(pay)+'</b> '+modeTag+
+      '<b>線上繳交攤位費 + 保證金</b>　應繳 <b style="color:#284664">'+fmt(pay)+'</b> '+modeTag+
       '<div style="margin-top:14px"><button class="btn btn-primary" id="payNow">立即線上付款 →</button></div>'+
       '<div class="paytip" id="payTip" style="margin-top:10px;font-size:.84rem;color:#7a715f"></div>';
     document.getElementById('payNow').onclick=async function(){
@@ -96,7 +96,7 @@
       try{
         const res=await fetch(p.CREATE_ORDER_ENDPOINT,{
           method:'POST', headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({ orderId:order, amount:pay, item:'嗅覺島2026參展 '+(plan||'')+' 訂金保證金', email:'' })
+          body:JSON.stringify({ orderId:order, amount:pay, item:'嗅覺島2026參展 '+(plan||'')+' 攤位費保證金', email:'' })
         });
         const j=await res.json();
         if(!res.ok || !j.ok) throw new Error(j.error||'金流建立失敗');
@@ -111,9 +111,9 @@
     };
   } else {
     // 線上金流關閉 → 顯示匯款備註（+ 若帶有應繳金額則一併顯示）
-    const note=(c.REMITTANCE&&c.REMITTANCE.NOTE)||'報名審核通過後，主辦單位將以 Email 提供匯款帳號，請依通知完成訂金與保證金匯款。';
+    const note=(c.REMITTANCE&&c.REMITTANCE.NOTE)||'報名審核通過後，主辦單位將以 Email 提供匯款帳號，請依通知一次付清攤位費與保證金。';
     box.innerHTML='<b>繳費方式｜報名審核後匯款</b>'
-      +(pay>0?'　本次應繳（簽約訂金＋保證金）約 <b style="color:#284664">'+fmt(pay)+'</b>':'')
+      +(pay>0?'　本次應繳（一次付清：攤位費＋保證金）約 <b style="color:#284664">'+fmt(pay)+'</b>':'')
       +'<div style="margin-top:10px;font-size:.9rem;line-height:1.9;color:#5a5142">'+note+'</div>';
   }
 })();
