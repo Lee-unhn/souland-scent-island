@@ -1,26 +1,23 @@
 /* =====================================================================
-   嗅覺島 SOULAND 2026 — 攤商報名頁邏輯
-   方案早鳥/一般雙價（早鳥至 6/30）；完整公司基本資訊 + 參展品類。
+   嗅覺島 SCENT ISLAND 2026 — 攤商報名頁邏輯
+   方案單一價（依新版活動簡介 2026）；完整公司基本資訊 + 參展品類。
    ===================================================================== */
 const CFG = window.SOULAND_CONFIG || {};
 
-/* 方案：早鳥價 / 一般價 / 格數上限（依 docx 報名表） */
+/* 方案：單一價 / 格數上限（依新版活動簡介 2026） */
 const PLANS = {
-  '市集攤位':     { early: 5000,  regular: 8000,  max: 1, spec: '彈車形式（靈活陳列）' },
-  '2×2 精巧攤位': { early: 18000, regular: 28000, max: 2, spec: '4㎡ 含桌架、隔板、配電、門牌' },
-  '3×3 標準攤位': { early: 25000, regular: 35000, max: 6, spec: '9㎡ 含桌架、隔板、配電、門牌' },
-  '供應鏈攤位':   { early: 25000, regular: 30000, max: 2, spec: '專區 原料/包材/設備供應商' }
+  '市集攤位':     { price: 6000,  max: 1,  spec: '攤車形式（靈活陳列）' },
+  '2×2 精巧攤位': { price: 28000, max: 2,  spec: '4㎡ 含桌架、隔板、配電、門牌' },
+  '3×3 標準攤位': { price: 35000, max: 6,  spec: '9㎡ 含桌架、隔板、配電、門牌' },
+  '供應鏈攤位':   { price: 30000, max: 12, spec: '專區 原料/包材/設備供應商' }
 };
 const DEPOSIT_PER = 10000;
-const EARLYBIRD_UNTIL = new Date('2026-06-30T23:59:59+08:00');
 let qty = 1;
 
-function isEarly(){ return new Date() <= EARLYBIRD_UNTIL; }
-function priceTypeLabel(){ return isEarly() ? '早鳥價' : '一般價'; }
 function fmt(n){ return 'NT$'+n.toLocaleString('en-US'); }
 function planName(){ return document.getElementById('f-plan').value; }
 function currentMax(){ return (PLANS[planName()]||{}).max || 1; }
-function unitPrice(){ const p=PLANS[planName()]||{}; return isEarly() ? p.early : p.regular; }
+function unitPrice(){ return (PLANS[planName()]||{}).price || 0; }
 
 function changeQty(d){ qty=Math.min(currentMax(),Math.max(1,qty+d)); recalc(); }
 function onPlanChange(){ if(qty>currentMax()) qty=currentMax(); recalc(); }
@@ -35,7 +32,7 @@ function recalc(){
   document.getElementById('qminus').disabled=(qty<=1);
   document.getElementById('qplus').disabled=(qty>=max);
   document.getElementById('qtyHint').textContent='此方案最少 1 格、最多 '+max+' 格';
-  document.getElementById('calcPlan').textContent=planName()+' × '+qty+' 格（'+priceTypeLabel()+'）';
+  document.getElementById('calcPlan').textContent=planName()+' × '+qty+' 格';
   document.getElementById('cUnit').textContent=fmt(unit);
   document.getElementById('cSub').textContent=fmt(sub);
   document.getElementById('cDep').textContent=fmt(dep);
@@ -73,7 +70,7 @@ async function submitApply(btn){
     foundedYear:V('f-year'), origin:V('f-origin'),
     categories,
     plan:planName(), qty,
-    priceType:isEarly()?'早鳥':'一般',
+    priceType:'單一價',
     unit:unitPrice(), subtotal:sub, deposit:dep, downpay:down, payable:down+dep,
     msg:V('f-msg'), ts:new Date().toISOString()
   };
