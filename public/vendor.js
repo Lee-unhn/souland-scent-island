@@ -27,7 +27,7 @@ function pickPlan(name){
 }
 function recalc(){
   const max=currentMax(), unit=unitPrice();
-  const sub=unit*qty, dep=DEPOSIT_PER*qty, down=Math.round(sub*0.5);
+  const sub=unit*qty, dep=DEPOSIT_PER*qty;
   document.getElementById('qtyval').textContent=qty;
   document.getElementById('qminus').disabled=(qty<=1);
   document.getElementById('qplus').disabled=(qty>=max);
@@ -36,8 +36,7 @@ function recalc(){
   document.getElementById('cUnit').textContent=fmt(unit);
   document.getElementById('cSub').textContent=fmt(sub);
   document.getElementById('cDep').textContent=fmt(dep);
-  document.getElementById('cDown').textContent=fmt(down);
-  document.getElementById('cTotal').textContent=fmt(down+dep);
+  document.getElementById('cTotal').textContent=fmt(sub+dep);
 }
 
 function toast(msg){
@@ -53,7 +52,7 @@ const V=id=>{ const e=document.getElementById(id); return e?e.value.trim():''; }
    送出申請 → 後端 /api/register（寫 Google Sheet + 本機備份）→ 報名完成頁
    ===================================================================== */
 async function submitApply(btn){
-  const sub=unitPrice()*qty, dep=DEPOSIT_PER*qty, down=Math.round(sub*0.5);
+  const sub=unitPrice()*qty, dep=DEPOSIT_PER*qty;
   const display=(document.querySelector('input[name=display]:checked')||{}).value||'品牌名稱';
   const categories=Array.from(document.querySelectorAll('input[name=cat]:checked')).map(c=>c.value);
 
@@ -71,7 +70,7 @@ async function submitApply(btn){
     categories,
     plan:planName(), qty,
     priceType:'單一價',
-    unit:unitPrice(), subtotal:sub, deposit:dep, downpay:down, payable:down+dep,
+    unit:unitPrice(), subtotal:sub, deposit:dep, payable:sub+dep,
     msg:V('f-msg'), ts:new Date().toISOString()
   };
 
