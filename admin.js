@@ -180,11 +180,11 @@ async function updateRegStatus(orderId,status){
 }
 
 /* ---------- 版面設定（首頁區塊顯示/排序 + 導覽/購票/報名）---------- */
-const SECTION_LABELS={stats:'展覽規模數據',awaken:'嗅覺五覺醒',highlights:'特色體驗',awards:'年度香氛大賞',schedule:'展期時間表'};
+const SECTION_LABELS={stats:'展覽規模數據',awaken:'嗅覺五覺醒',highlights:'特色體驗',awards:'年度香氛大賞',schedule:'展期時間表',media:'媒體夥伴'};
 const NAV_LABELS={about:'關於',visit:'展覽資訊',experience:'特色體驗',brands:'參展品牌',awards:'年度大賞'};
 let LAYOUT=null;
 function defaultLayout(){
-  return { sections:[{key:'stats',visible:true},{key:'awaken',visible:true},{key:'highlights',visible:true},{key:'awards',visible:true},{key:'schedule',visible:true}],
+  return { sections:[{key:'stats',visible:true},{key:'awaken',visible:true},{key:'highlights',visible:true},{key:'awards',visible:true},{key:'schedule',visible:true},{key:'media',visible:true}],
     nav:{about:true,visit:true,experience:true,brands:true,awards:true}, ticket:true, register:true };
 }
 async function loadLayout(){
