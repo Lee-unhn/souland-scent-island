@@ -36,6 +36,7 @@ function go(p){
   document.querySelectorAll('.nav-links [data-nav]').forEach(b=>b.classList.remove('on'));
   const nb=document.getElementById('nav-'+p); if(nb) nb.classList.add('on');
   if(p==='brands') Brands.render();
+  if(p==='perfumers') loadPerfumers();
   if(p==='visit') renderAllocation();
   const nav=document.querySelector('.nav'); if(nav) nav.classList.remove('open');
   window.scrollTo({top:0,behavior:'smooth'});

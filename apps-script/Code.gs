@@ -275,10 +275,9 @@ var DEFAULT_LAYOUT = {
     { key:'highlights', visible:true },
     { key:'awards',     visible:true },
     { key:'schedule',   visible:true },
-    { key:'perfumers',  visible:true },
     { key:'media',      visible:true }
   ],
-  nav: { about:true, visit:true, experience:true, brands:true, awards:true },
+  nav: { about:true, visit:true, experience:true, brands:true, perfumers:true, awards:true },
   ticket: true,
   register: true
 };
