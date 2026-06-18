@@ -243,6 +243,44 @@ async function loadBrands(){
   renderAllocation();
 }
 
+/* ---- 調香師專區（後台維護 → 公開顯示）---- */
+function pfEsc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function pfSocialHTML(social){
+  if(!social) return '';
+  return String(social).split(/[\s,;]+/).filter(Boolean).map(function(u){
+    var href = /^https?:\/\//.test(u) ? u : 'https://'+u;
+    var label = u.replace(/^https?:\/\/(www\.)?/,'').replace(/\/+$/,'');
+    if(label.length>24) label=label.slice(0,24)+'…';
+    return '<a href="'+pfEsc(href)+'" target="_blank" rel="noopener">'+pfEsc(label)+'</a>';
+  }).join('');
+}
+function renderPerfumers(list){
+  var grid=document.getElementById('perfumergrid'); if(!grid) return;
+  if(!list.length){ grid.innerHTML='<div class="pf-empty">調香師陣容陸續公布中。</div>'; return; }
+  grid.innerHTML=list.map(function(p){
+    var img = p.photo
+      ? '<img src="'+pfEsc(p.photo)+'" alt="'+pfEsc(p.name)+'" loading="lazy">'
+      : '<span class="pf-init">'+((p.name||'·').trim().charAt(0))+'</span>';
+    return '<article class="pf-card"><div class="pf-photo">'+img+'</div>'+
+      '<h3 class="pf-name">'+pfEsc(p.name)+'</h3>'+
+      (p.bio?'<p class="pf-bio">'+pfEsc(p.bio).replace(/\n/g,'<br>')+'</p>':'')+
+      (p.social?'<div class="pf-social">'+pfSocialHTML(p.social)+'</div>':'')+
+      '</article>';
+  }).join('');
+}
+async function loadPerfumers(){
+  if(!document.getElementById('perfumergrid')) return;
+  let list=[];
+  try{
+    if(window.SOULAND_NET && SOULAND_NET.live()){
+      const j=await SOULAND_NET.get('perfumersPublic');
+      if(j && j.ok && Array.isArray(j.perfumers)) list=j.perfumers;
+    }
+  }catch(e){}
+  if(!list.length){ try{ const p=await (await fetch('perfumers.json',{cache:'no-store'})).json(); if(Array.isArray(p)) list=p; }catch(e){} }
+  renderPerfumers(list);
+}
+
 /* ---- 套用後台「版面設定」：首頁區塊顯示/排序 + 導覽/購票/報名開關 ---- */
 async function applyLayout(){
   if(!(window.SOULAND_NET && SOULAND_NET.live())) return;  // 無後端 → 維持原始版面
@@ -275,4 +313,5 @@ buildContours();
 tick(); setInterval(tick,1000);
 applyTicketUrl();
 loadBrands();
+loadPerfumers();
 applyLayout();

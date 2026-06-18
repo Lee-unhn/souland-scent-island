@@ -73,6 +73,10 @@ function route_(action, d){
     case 'brandList':    return brandList_(d);
     case 'brandSave':    return brandSave_(d);
     case 'brandDelete':  return brandDelete_(d);
+    case 'perfumersPublic': return perfumersPublic_();
+    case 'perfumerList':    return perfumerList_(d);
+    case 'perfumerSave':    return perfumerSave_(d);
+    case 'perfumerDelete':  return perfumerDelete_(d);
     case 'layoutGet':    return layoutGet_();
     case 'layoutSave':   return layoutSave_(d);
     case 'textGet':      return textGet_();
@@ -215,6 +219,53 @@ function brandDelete_(d){
   return json_({ok:true});
 }
 
+/* ---------- 調香師專區（CRUD，Script Property: SHEET_PERFUMERS）----------
+   欄位：姓名 / 照片URL / 介紹 / 社群連結 / 公開顯示。id = 試算表列號。 */
+var PERFUMER_HEADERS = ['姓名','照片URL','介紹','社群連結','公開顯示'];
+function perfumerSheet_(){
+  var id = P('SHEET_PERFUMERS'); if(!id) return null;
+  var sh = ssById_(id).getSheets()[0];
+  if(sh.getLastRow()===0){ sh.appendRow(PERFUMER_HEADERS); sh.getRange(1,1,1,PERFUMER_HEADERS.length).setFontWeight('bold'); sh.setFrozenRows(1); }
+  return sh;
+}
+function rowToPerfumer_(H, row, rowNum){
+  function c(n){ var i=H.indexOf(n); return i>=0 ? row[i] : ''; }
+  var pub = String(c('公開顯示')).trim();
+  return { id:String(rowNum), name:c('姓名'), photo:c('照片URL'), bio:c('介紹'), social:c('社群連結'),
+    published: !(pub && pub.indexOf('否')>=0) };
+}
+function perfumerToRow_(p){ return [ p.name||'', p.photo||'', p.bio||'', p.social||'', (p.published===false?'否':'是') ]; }
+function perfumersPublic_(){
+  var sh = perfumerSheet_(); if(!sh) return json_({ok:true,perfumers:[]});
+  var v = sh.getDataRange().getValues(); if(v.length<2) return json_({ok:true,perfumers:[]});
+  var H = v[0]; var out=[];
+  for(var i=1;i<v.length;i++){ if(!v[i][0]) continue; var p=rowToPerfumer_(H,v[i],i+1); if(p.published) out.push(p); }
+  return json_({ok:true,perfumers:out});
+}
+function perfumerList_(d){
+  if(!verify_(d.token)) return json_({ok:false,error:'未授權或逾時'});
+  var sh = perfumerSheet_(); if(!sh) return json_({ok:false,error:'未設定 SHEET_PERFUMERS'});
+  var v = sh.getDataRange().getValues(); var H = v[0]; var out=[];
+  for(var i=1;i<v.length;i++){ if(!v[i][0]) continue; out.push(rowToPerfumer_(H,v[i],i+1)); }
+  return json_({ok:true,perfumers:out});
+}
+function perfumerSave_(d){
+  if(!verify_(d.token)) return json_({ok:false,error:'未授權或逾時'});
+  if(!String(d.name||'').trim()) return json_({ok:false,error:'姓名必填'});
+  var sh = perfumerSheet_(); if(!sh) return json_({ok:false,error:'未設定 SHEET_PERFUMERS'});
+  var rowArr = perfumerToRow_(d);
+  if(d.id){ sh.getRange(Number(d.id),1,1,PERFUMER_HEADERS.length).setValues([rowArr]); }
+  else { sh.appendRow(rowArr); }
+  return json_({ok:true});
+}
+function perfumerDelete_(d){
+  if(!verify_(d.token)) return json_({ok:false,error:'未授權或逾時'});
+  if(!d.id) return json_({ok:false,error:'缺少 id'});
+  var sh = perfumerSheet_(); if(!sh) return json_({ok:false,error:'未設定 SHEET_PERFUMERS'});
+  sh.deleteRow(Number(d.id));
+  return json_({ok:true});
+}
+
 /* ---------- 版面設定（首頁區塊顯示/排序 + 導覽/購票/報名開關）----------
    存 Script Properties 'LAYOUT'（JSON）。layoutGet 公開（前台載入用）。 */
 var DEFAULT_LAYOUT = {
@@ -224,6 +275,7 @@ var DEFAULT_LAYOUT = {
     { key:'highlights', visible:true },
     { key:'awards',     visible:true },
     { key:'schedule',   visible:true },
+    { key:'perfumers',  visible:true },
     { key:'media',      visible:true }
   ],
   nav: { about:true, visit:true, experience:true, brands:true, awards:true },

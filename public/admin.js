@@ -136,13 +136,69 @@ async function delBrand(id,name){
 }
 $('mask').addEventListener('click',e=>{ if(e.target===$('mask')) closeEditor(); });
 
+/* ---------- 調香師 CRUD ---------- */
+let PERFUMERS=[];
+async function loadPerf(){
+  try{
+    const j = LIVE() ? await SOULAND_NET.post('perfumerList',{token:TOKEN}) : {ok:false,error:'本機模式不支援'};
+    if(j && j.ok===false && /授權|逾時/.test(j.error||'')){ logout(); toast('登入逾時，請重新登入'); return; }
+    if(!j || !j.ok){ $('pfList').innerHTML='<div class="empty">無法載入：'+esc((j&&j.error)||'未設定 SHEET_PERFUMERS（請在 Apps Script 設定屬性並重新部署）')+'</div>'; $('pfCount').textContent=''; return; }
+    PERFUMERS=j.perfumers||[]; renderPerf();
+  }catch(e){ $('pfList').innerHTML='<div class="empty">載入錯誤：'+esc((e&&e.message)||e)+'</div>'; }
+}
+function renderPerf(){
+  $('pfCount').textContent='（共 '+PERFUMERS.length+' 位）';
+  const box=$('pfList');
+  if(!PERFUMERS.length){ box.innerHTML='<div class="empty">尚無調香師資料。點右上「＋ 新增調香師」開始建立（會寫入 Google Sheet，並同步顯示在官網「調香師專區」）。</div>'; return; }
+  box.innerHTML='<table><thead><tr><th>調香師</th><th>介紹</th><th>狀態</th><th></th></tr></thead><tbody>'+
+    PERFUMERS.map(p=>'<tr>'+
+      '<td><b>'+esc(p.name)+'</b></td>'+
+      '<td><small style="color:#8a8170">'+esc((p.bio||'').slice(0,40))+((p.bio||'').length>40?'…':'')+'</small></td>'+
+      '<td><span class="pill '+(p.published!==false?'on':'off')+'">'+(p.published!==false?'已公開':'未公開')+'</span></td>'+
+      '<td><div class="acts">'+
+        '<button class="btn btn-g btn-s" onclick="openPerf(\''+p.id+'\')">編輯</button>'+
+        '<button class="btn btn-d btn-s" onclick="delPerf(\''+p.id+'\',\''+esc(p.name).replace(/\'/g,"")+'\')">刪除</button>'+
+      '</div></td></tr>').join('')+'</tbody></table>';
+}
+function openPerf(id){
+  const p = id ? PERFUMERS.find(x=>x.id===id) : null;
+  $('pf-title').textContent = p ? '編輯調香師' : '新增調香師';
+  $('pf-id').value=p?p.id:'';
+  ['name','photo','bio','social'].forEach(k=>{ $('pf-'+k).value=p?(p[k]||''):''; });
+  $('pf-pub').checked = p ? (p.published!==false) : true;
+  $('mask-pf').classList.add('show');
+}
+function closePerf(){ $('mask-pf').classList.remove('show'); }
+async function savePerf(btn){
+  const payload={ name:$('pf-name').value.trim(), photo:$('pf-photo').value.trim(),
+    bio:$('pf-bio').value.trim(), social:$('pf-social').value.trim(), published:$('pf-pub').checked };
+  if(!payload.name){ toast('姓名必填'); return; }
+  const id=$('pf-id').value;
+  btn.disabled=true; btn.textContent='儲存中…';
+  try{
+    const j = LIVE() ? await SOULAND_NET.post('perfumerSave', Object.assign({token:TOKEN,id:id||''},payload)) : {ok:false,error:'本機模式不支援'};
+    if(!j.ok){ toast(j.error||'儲存失敗'); return; }
+    toast(id?'已更新':'已新增'); closePerf(); loadPerf();
+  }catch(e){ toast('儲存錯誤：'+((e&&e.message)||e)); }
+  finally{ btn.disabled=false; btn.textContent='儲存'; }
+}
+async function delPerf(id,name){
+  if(!confirm('確定刪除「'+name+'」？此動作無法復原。')) return;
+  try{
+    const j = LIVE() ? await SOULAND_NET.post('perfumerDelete',{token:TOKEN,id}) : {ok:false};
+    if(j.ok){ toast('已刪除'); loadPerf(); } else toast(j.error||'刪除失敗');
+  }catch(e){ toast('刪除錯誤：'+((e&&e.message)||e)); }
+}
+$('mask-pf').addEventListener('click',e=>{ if(e.target===$('mask-pf')) closePerf(); });
+
 /* ---------- 報名管理（= 報名回寫 Sheet 的同一份資料）---------- */
 const REG_STATUSES=[['pending_remit','待匯款'],['remitted','已匯款'],['reviewing','審核中'],['approved','審核通過'],['payment_failed','付款失敗']];
 function switchTab(which){
-  ['brands','regs','layout','text'].forEach(t=>{
+  ['brands','perfumers','regs','layout','text'].forEach(t=>{
     const v=$('view-'+t); if(v) v.style.display=(t===which)?'block':'none';
     const b=$('tab-'+t); if(b) b.classList.toggle('on', t===which);
   });
+  if(which==='perfumers') loadPerf();
   if(which==='regs') loadRegs();
   if(which==='layout') loadLayout();
   if(which==='text') loadText();
@@ -180,11 +236,11 @@ async function updateRegStatus(orderId,status){
 }
 
 /* ---------- 版面設定（首頁區塊顯示/排序 + 導覽/購票/報名）---------- */
-const SECTION_LABELS={stats:'展覽規模數據',awaken:'嗅覺五覺醒',highlights:'特色體驗',awards:'年度香氛大賞',schedule:'展期時間表',media:'媒體夥伴'};
+const SECTION_LABELS={stats:'展覽規模數據',awaken:'嗅覺五覺醒',highlights:'特色體驗',awards:'年度香氛大賞',schedule:'展期時間表',perfumers:'調香師專區',media:'媒體夥伴'};
 const NAV_LABELS={about:'關於',visit:'展覽資訊',experience:'特色體驗',brands:'參展品牌',awards:'年度大賞'};
 let LAYOUT=null;
 function defaultLayout(){
-  return { sections:[{key:'stats',visible:true},{key:'awaken',visible:true},{key:'highlights',visible:true},{key:'awards',visible:true},{key:'schedule',visible:true},{key:'media',visible:true}],
+  return { sections:[{key:'stats',visible:true},{key:'awaken',visible:true},{key:'highlights',visible:true},{key:'awards',visible:true},{key:'schedule',visible:true},{key:'perfumers',visible:true},{key:'media',visible:true}],
     nav:{about:true,visit:true,experience:true,brands:true,awards:true}, ticket:true, register:true };
 }
 async function loadLayout(){

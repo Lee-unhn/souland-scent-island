@@ -146,6 +146,7 @@
   <div class="wrap">
     <div class="tabs">
       <button class="tab on" id="tab-brands" onclick="switchTab('brands')">參展廠商</button>
+      <button class="tab" id="tab-perfumers" onclick="switchTab('perfumers')">調香師</button>
       <button class="tab" id="tab-regs" onclick="switchTab('regs')">報名管理</button>
       <button class="tab" id="tab-layout" onclick="switchTab('layout')">版面設定</button>
       <button class="tab" id="tab-text" onclick="switchTab('text')">文案</button>
@@ -157,6 +158,15 @@
         <button class="btn btn-p" onclick="openEditor()">＋ 新增參展廠商</button>
       </div>
       <div id="list"></div>
+    </div>
+
+    <div id="view-perfumers" style="display:none">
+      <div class="bar">
+        <h2>調香師管理 <span id="pfCount"></span></h2>
+        <button class="btn btn-p" onclick="openPerf()">＋ 新增調香師</button>
+      </div>
+      <p class="reg-note">新增／編輯／刪除調香師（姓名、照片、介紹、社群連結），儲存後官網「調香師專區」即同步顯示（寫入 Google Sheet）。照片請填可公開存取的圖片網址。</p>
+      <div id="pfList"></div>
     </div>
 
     <div id="view-regs" style="display:none">
@@ -235,6 +245,28 @@
     <div class="modal-f">
       <button class="btn btn-g" onclick="closeEditor()">取消</button>
       <button class="btn btn-p" id="m-save" onclick="saveBrand(this)">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 調香師 EDITOR ============ -->
+<div class="mask" id="mask-pf">
+  <div class="modal">
+    <div class="modal-h"><h3 id="pf-title">新增調香師</h3><button class="x" onclick="closePerf()">×</button></div>
+    <div class="modal-b">
+      <input type="hidden" id="pf-id">
+      <div class="g2">
+        <div class="fld"><label>姓名 *</label><input id="pf-name" placeholder="必填"></div>
+        <div class="fld"><label>照片網址</label><input id="pf-photo" placeholder="https://…/photo.jpg"></div>
+      </div>
+      <div class="fld"><label>介紹</label><textarea id="pf-bio" rows="4" placeholder="調香師簡介、專長、代表作…"></textarea></div>
+      <div class="fld"><label>社群連結（多個用空白或逗號分隔）</label><textarea id="pf-social" rows="2" placeholder="https://instagram.com/...　https://..."></textarea></div>
+      <div class="seg">發布</div>
+      <label class="toggle"><input type="checkbox" id="pf-pub" checked> 在官網「調香師專區」公開顯示</label>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-g" onclick="closePerf()">取消</button>
+      <button class="btn btn-p" id="pf-save" onclick="savePerf(this)">儲存</button>
     </div>
   </div>
 </div>
