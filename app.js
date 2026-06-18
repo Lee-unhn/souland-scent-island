@@ -301,6 +301,22 @@ async function applyLayout(){
       if(!cfg.sections.some(s=>s.key===el.dataset.section)) home.appendChild(el);
     });
   }
+  // 各獨立頁段落：依設定排序 + 顯示/隱藏
+  if(cfg.pages){
+    Object.keys(cfg.pages).forEach(pk=>{
+      const pg=document.getElementById('page-'+pk);
+      if(!pg || !Array.isArray(cfg.pages[pk])) return;
+      cfg.pages[pk].forEach(s=>{
+        const el=pg.querySelector('[data-section="'+s.key+'"]');
+        if(!el) return;
+        el.style.display=(s.visible===false)?'none':'';
+        pg.appendChild(el);  // 移到設定順序（header 之後）
+      });
+      pg.querySelectorAll('[data-section]').forEach(el=>{
+        if(!cfg.pages[pk].some(s=>s.key===el.dataset.section)) pg.appendChild(el);
+      });
+    });
+  }
   // 導覽列項目
   if(cfg.nav){ Object.keys(cfg.nav).forEach(k=>{ const b=document.getElementById('nav-'+k); if(b) b.style.display = (cfg.nav[k]===false)?'none':''; }); }
   // 購票鈕
