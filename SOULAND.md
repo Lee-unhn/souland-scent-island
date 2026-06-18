@@ -100,7 +100,21 @@ npm start            # → http://localhost:3000
 - 機制：**零標記、全站任何字可改**；只比對「整段相等」，不會把長句中的字亂代換。暫不替換表單 placeholder 等屬性文字。
 - **兩種編輯方式**（同步）：① 後台 `/admin.html`「**文案**」分頁（搜尋原文 → 改「新文字」→ 儲存，只回寫有變更的列）② 直接編 Google「文案」Sheet。
 - 後端：`textGet`（公開，前台讀）／`textList`＋`textSave`（後台，需 token）皆讀 Script Property `SHEET_TEXT` 指向的「文案」Sheet。
-- 建立：把 `嗅覺島-文案表-匯入Google用.csv`（428 段、已 gitignore）匯入成新 Google Sheet → 把 Sheet ID 設成 Apps Script 的 `SHEET_TEXT` 屬性 → 重新部署 Code.gs。
+- 建立：把 `嗅覺島-文案表-匯入Google用.csv`（已 gitignore）匯入成新 Google Sheet → 把 Sheet ID 設成 Apps Script 的 `SHEET_TEXT` 屬性 → 重新部署 Code.gs。
+
+**⑥ 調香師專區（獨立頁 + CRUD，2026-06-17）**：獨立頁面 `#page-perfumers`，由上方導覽列「調香師」按鈕跳轉（非首頁區塊）。後台「調香師」分頁可新增／編輯／刪除（姓名・照片URL・介紹・社群連結・是否公開），存 Apps Script 屬性 `SHEET_PERFUMERS` 指向的 Sheet（首次存取自動補表頭），前台 `loadPerfumers` 即時顯示。後端 `perfumerList/Save/Delete/perfumersPublic`。
+
+**⑦ L1/L2 版面控制延伸到各獨立頁（2026-06-17）**：版面設定原本只控首頁區塊，現延伸到關於／展覽資訊／特色體驗／年度大賞／B2B媒體各頁。
+- 機制：各獨立頁段落加 `data-section` 標記；layout 結構從 `sections`(首頁) 擴成 `sections + pages{about,visit,experience,awards,partners}`；`app.js applyLayout` 依 `cfg.pages` 對各頁段落排序／顯示隱藏（未列入者自動排最後）。
+- 後台：版面設定加「分頁切換」鈕，逐頁 ↑↓ 排序＋勾選顯示/隱藏；下方仍有「導覽列項目（整頁開關）」與購票/報名開關。
+- 啟用：後台版面設定**存一次即生效**；重部署 Code.gs 為可選（只影響沒存過的預設狀態）。
+
+**⑧ 近期內容／部署更新（2026-06-16~17）**：
+- **英文名改 SOUL LAND**（原 SCENT ISLAND；網域/email 維持 soulland 不動）。
+- **攤位改一次付清**（攤位費全額＋保證金，移除簽約訂金50%/尾款）。單一價：3×3 **35,000**・2×2 **28,000**・供應鏈 **30,000**・市集 **6,000**；保證金 10,000/格、展後45天退。報名 Sheet 結構不變（「簽約應繳」欄值＝全額+保證金）。
+- **首頁底部「媒體夥伴」專區**（生活風格／文化設計／數位KOL 三組）。
+- **Meta Pixel**（PageView，像素 ID 26705614572453923）植入對外頁 `<head>`（admin 不裝）。
+- **上線**：GitHub 公開 repo → **Netlify 部署**，正式網域 **https://soullandtw.com**（GoDaddy 網域＋Let's Encrypt SSL）。`netlify.toml` 對 *.html/*.js/*.css no-cache。另備 GitHub Pages 搬遷（gh-pages 分支＋CNAME，未啟用）。
 
 ## 4. 內容來源
 
@@ -125,11 +139,13 @@ npm start            # → http://localhost:3000
 | P1 設計系統 + 主頁五區 | 主頁/展覽資訊/特色體驗/參展品牌/年度大賞 | ✅ 100% |
 | P2 報名頁 | 4 方案 + 申請流程 + 報名表 + 費用試算 | ✅ 100% |
 | P3 金流（測試） | 綠界 ECPay STAGE 端對端、CheckMacValue 驗證 PASS | ✅ 100% |
-| P4 Google Sheet 回寫 | 後端寫入邏輯 + Apps Script | 🟡 90%（等貼 webhook URL + 部署） |
-| P5 架構圖 + 文件 | 互動架構圖（[`docs/diagrams/2026-06-16_嗅覺島-souland_預設圖/`](docs/diagrams/2026-06-16_嗅覺島-souland_預設圖/)，headless 驗證 17+46 節點 0 錯）、SOULAND.md、README、總覽 | ✅ 100% |
-| P6 部署上線 | 使用者選**本機可跑版**；上線另議 | ⬜ 待辦 |
+| P4 Google Sheet 回寫 | Apps Script 後端：報名/品牌/工作坊/文案/調香師/版面，全走 JSONP | ✅ 100%（已部署、線上驗證） |
+| P5 架構圖 + 文件 | 互動架構圖（[`docs/diagrams/2026-06-16_嗅覺島-souland_預設圖/`](docs/diagrams/2026-06-16_嗅覺島-souland_預設圖/)）、SOULAND.md、README、總覽 | ✅ 100%（架構已大改，下次重畫） |
+| P6 部署上線 | GitHub repo → **Netlify**，正式網域 **https://soullandtw.com**（SSL） | ✅ 100% |
+| P7 後台功能 | 品牌 CRUD・報名管理・文案(L3b)・調香師 CRUD・版面 L1/L2（首頁＋各獨立頁） | ✅ 100% |
+| P8 行銷/內容 | Meta Pixel・SOUL LAND・一次付清・媒體夥伴・調香師專區 | ✅ 100% |
 
-**全程約 88%**（本機可跑版已達標；剩 webhook 部署 + 上線屬使用者端動作）。
+**全程約 99%**（站體＋後端＋後台＋網域＋SSL 全上線；剩內容陸續填入＝主辦端日常維運）。
 
 ## 7. 治理 · PM 指揮層級（CLAUDE.md §3.6.2.1）
 
