@@ -277,6 +277,13 @@ var DEFAULT_LAYOUT = {
     { key:'schedule',   visible:true },
     { key:'media',      visible:true }
   ],
+  pages: {
+    about:      [{key:'ab-position',visible:true},{key:'ab-concept',visible:true},{key:'ab-org',visible:true}],
+    visit:      [{key:'vi-info',visible:true},{key:'vi-floor',visible:true},{key:'vi-schedule',visible:true},{key:'vi-notes',visible:true}],
+    experience: [{key:'ex-cards',visible:true},{key:'ex-workshop',visible:true}],
+    awards:     [{key:'aw-main',visible:true},{key:'aw-vote',visible:true}],
+    partners:   [{key:'pa-b2b',visible:true},{key:'pa-press',visible:true}]
+  },
   nav: { about:true, visit:true, experience:true, brands:true, perfumers:true, awards:true },
   ticket: true,
   register: true

@@ -236,38 +236,65 @@ async function updateRegStatus(orderId,status){
 }
 
 /* ---------- 版面設定（首頁區塊顯示/排序 + 導覽/購票/報名）---------- */
-const SECTION_LABELS={stats:'展覽規模數據',awaken:'嗅覺五覺醒',highlights:'特色體驗',awards:'年度香氛大賞',schedule:'展期時間表',media:'媒體夥伴'};
+const SECTION_LABELS={
+  stats:'展覽規模數據',awaken:'嗅覺五覺醒',highlights:'特色體驗',awards:'年度香氛大賞',schedule:'展期時間表',media:'媒體夥伴',
+  'ab-position':'展覽定位','ab-concept':'策展理念','ab-org':'主辦與協辦',
+  'vi-info':'日期地點資訊','vi-floor':'展場規劃與動線','vi-schedule':'每日活動行事曆','vi-notes':'入場須知',
+  'ex-cards':'特色體驗卡片','ex-workshop':'工作坊登記',
+  'aw-main':'獎項（四季/榜單/品牌）','aw-vote':'評審與票選',
+  'pa-b2b':'B2B 採購媒合','pa-press':'媒體中心'
+};
 const NAV_LABELS={about:'關於',visit:'展覽資訊',experience:'特色體驗',brands:'參展品牌',perfumers:'調香師',awards:'年度大賞'};
-let LAYOUT=null;
+const PAGE_TABS=[['home','首頁'],['about','關於'],['visit','展覽資訊'],['experience','特色體驗'],['awards','年度大賞'],['partners','B2B・媒體']];
+let LAYOUT=null, LAYOUT_PAGE='home';
 function defaultLayout(){
-  return { sections:[{key:'stats',visible:true},{key:'awaken',visible:true},{key:'highlights',visible:true},{key:'awards',visible:true},{key:'schedule',visible:true},{key:'media',visible:true}],
-    nav:{about:true,visit:true,experience:true,brands:true,perfumers:true,awards:true}, ticket:true, register:true };
+  return {
+    sections:[{key:'stats',visible:true},{key:'awaken',visible:true},{key:'highlights',visible:true},{key:'awards',visible:true},{key:'schedule',visible:true},{key:'media',visible:true}],
+    pages:{
+      about:[{key:'ab-position',visible:true},{key:'ab-concept',visible:true},{key:'ab-org',visible:true}],
+      visit:[{key:'vi-info',visible:true},{key:'vi-floor',visible:true},{key:'vi-schedule',visible:true},{key:'vi-notes',visible:true}],
+      experience:[{key:'ex-cards',visible:true},{key:'ex-workshop',visible:true}],
+      awards:[{key:'aw-main',visible:true},{key:'aw-vote',visible:true}],
+      partners:[{key:'pa-b2b',visible:true},{key:'pa-press',visible:true}]
+    },
+    nav:{about:true,visit:true,experience:true,brands:true,perfumers:true,awards:true}, ticket:true, register:true
+  };
 }
 async function loadLayout(){
   try{ const j = LIVE() ? await SOULAND_NET.get('layoutGet') : {ok:false};
     LAYOUT = (j&&j.ok&&j.layout) ? j.layout : defaultLayout();
   }catch(e){ LAYOUT = defaultLayout(); }
-  if(!LAYOUT.sections) LAYOUT.sections=defaultLayout().sections;
-  if(!LAYOUT.nav) LAYOUT.nav=defaultLayout().nav;
+  const d=defaultLayout();
+  if(!LAYOUT.sections) LAYOUT.sections=d.sections;
+  if(!LAYOUT.nav) LAYOUT.nav=d.nav;
+  if(!LAYOUT.pages) LAYOUT.pages={};
+  Object.keys(d.pages).forEach(k=>{ if(!Array.isArray(LAYOUT.pages[k])) LAYOUT.pages[k]=d.pages[k]; });
   renderLayout();
 }
-function setSecVis(i,v){ LAYOUT.sections[i].visible=v; }
+function curSecs(){ return LAYOUT_PAGE==='home' ? LAYOUT.sections : (LAYOUT.pages[LAYOUT_PAGE]||[]); }
+function setLayoutPage(p){ LAYOUT_PAGE=p; renderLayout(); }
+function setSecVis(i,v){ const a=curSecs(); if(a[i]) a[i].visible=v; }
 function setNavVis(k,v){ LAYOUT.nav[k]=v; }
 function setFlag(k,v){ LAYOUT[k]=v; }
-function moveSection(i,dir){ const a=LAYOUT.sections,j=i+dir; if(j<0||j>=a.length) return; const t=a[i];a[i]=a[j];a[j]=t; renderLayout(); }
+function moveSection(i,dir){ const a=curSecs(),j=i+dir; if(j<0||j>=a.length) return; const t=a[i];a[i]=a[j];a[j]=t; renderLayout(); }
 function renderLayout(){
   const L=LAYOUT;
-  const sec=L.sections.map((s,i)=>'<div class="lay-row"><div class="ord">'+
+  const ptabs=PAGE_TABS.map(t=>'<button class="ptab'+(t[0]===LAYOUT_PAGE?' on':'')+'" onclick="setLayoutPage(\''+t[0]+'\')">'+esc(t[1])+'</button>').join('');
+  const list=curSecs();
+  const pageName=(PAGE_TABS.find(t=>t[0]===LAYOUT_PAGE)||['','此頁'])[1];
+  const sec=list.length ? list.map((s,i)=>'<div class="lay-row"><div class="ord">'+
     '<button onclick="moveSection('+i+',-1)" '+(i===0?'disabled':'')+'>↑</button>'+
-    '<button onclick="moveSection('+i+',1)" '+(i===L.sections.length-1?'disabled':'')+'>↓</button></div>'+
+    '<button onclick="moveSection('+i+',1)" '+(i===list.length-1?'disabled':'')+'>↓</button></div>'+
     '<span class="nm">'+esc(SECTION_LABELS[s.key]||s.key)+'</span>'+
-    '<label class="vis"><input type="checkbox" '+(s.visible!==false?'checked':'')+' onchange="setSecVis('+i+',this.checked)"> 顯示</label></div>').join('');
+    '<label class="vis"><input type="checkbox" '+(s.visible!==false?'checked':'')+' onchange="setSecVis('+i+',this.checked)"> 顯示</label></div>').join('') : '<div class="hint2">此頁無可調整段落</div>';
   const nav=Object.keys(NAV_LABELS).map(k=>'<div class="lay-row"><span class="nm">'+esc(NAV_LABELS[k])+'</span>'+
     '<label class="vis"><input type="checkbox" '+(L.nav[k]!==false?'checked':'')+' onchange="setNavVis(\''+k+'\',this.checked)"> 顯示</label></div>').join('');
   const glob='<div class="lay-row"><span class="nm">購票按鈕</span><label class="vis"><input type="checkbox" '+(L.ticket!==false?'checked':'')+' onchange="setFlag(\'ticket\',this.checked)"> 顯示</label></div>'+
     '<div class="lay-row"><span class="nm">「我要參展」報名入口</span><label class="vis"><input type="checkbox" '+(L.register!==false?'checked':'')+' onchange="setFlag(\'register\',this.checked)"> 顯示</label></div>';
-  $('layoutBox').innerHTML='<div class="lay-group"><h4>首頁區塊</h4><div class="hint2">↑↓ 調整官網首頁區塊順序；取消勾選＝隱藏。</div>'+sec+'</div>'+
-    '<div class="lay-group"><h4>導覽列項目</h4>'+nav+'</div>'+
+  $('layoutBox').innerHTML=
+    '<div class="lay-group"><h4>頁面區塊（選分頁調整）</h4><div class="lay-tabs">'+ptabs+'</div>'+
+      '<div class="hint2">↑↓ 調整「'+esc(pageName)+'」的段落順序；取消勾選＝隱藏。</div>'+sec+'</div>'+
+    '<div class="lay-group"><h4>導覽列項目</h4><div class="hint2">關掉＝隱藏該頁的導覽按鈕（整頁入口）。</div>'+nav+'</div>'+
     '<div class="lay-group"><h4>其他</h4>'+glob+'</div>';
 }
 async function saveLayout(btn){
