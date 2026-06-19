@@ -255,12 +255,21 @@ function pfSocialHTML(social){
     return '<a href="'+pfEsc(href)+'" target="_blank" rel="noopener">'+pfEsc(label)+'</a>';
   }).join('');
 }
+// 把 Google Drive 分享連結轉成可 <img> 直連的縮圖網址；其他網址原樣回傳
+function pfPhotoURL(u){
+  if(!u) return '';
+  u=String(u).trim();
+  var m = u.match(/\/file\/d\/([-\w]+)/) || u.match(/[?&]id=([-\w]+)/) || u.match(/\/d\/([-\w]+)/);
+  if(m) return 'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w800';
+  return u;
+}
 function renderPerfumers(list){
   var grid=document.getElementById('perfumergrid'); if(!grid) return;
   if(!list.length){ grid.innerHTML='<div class="pf-empty">調香師陣容陸續公布中。</div>'; return; }
   grid.innerHTML=list.map(function(p){
-    var img = p.photo
-      ? '<img src="'+pfEsc(p.photo)+'" alt="'+pfEsc(p.name)+'" loading="lazy">'
+    var src = pfPhotoURL(p.photo);
+    var img = src
+      ? '<img src="'+pfEsc(src)+'" alt="'+pfEsc(p.name)+'" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.innerHTML=\'<span class=\\\'pf-init\\\'>'+((p.name||'·').trim().charAt(0))+'</span>\'">'
       : '<span class="pf-init">'+((p.name||'·').trim().charAt(0))+'</span>';
     return '<article class="pf-card"><div class="pf-photo">'+img+'</div>'+
       '<h3 class="pf-name">'+pfEsc(p.name)+'</h3>'+
