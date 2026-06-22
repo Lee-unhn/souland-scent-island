@@ -416,3 +416,7 @@ a{color:inherit;text-decoration:none}
 .orglogo img{max-height:60px;max-width:230px;object-fit:contain;display:block}
 .orglogo-text{font-family:'Noto Serif TC',serif;font-size:1.12rem;letter-spacing:.08em;color:var(--indigo)}
 @media(max-width:560px){.orglogo{min-width:0;flex:1 1 100%}}
+.foot-logos{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:4px}
+.foot-logo{display:inline-flex;align-items:center;background:#fff;border-radius:6px;padding:5px 11px;height:34px}
+.foot-logo img{max-height:24px;max-width:130px;object-fit:contain;display:block}
+.foot-issa{font-size:.82rem;color:var(--paper);opacity:.85;letter-spacing:.06em}
