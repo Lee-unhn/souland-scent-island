@@ -19,3 +19,6 @@ public/assets/souland-prospectus.pdf
 
 # L3b 文案匯入用 CSV（一次性，匯入後不需進 repo）
 嗅覺島-文案表-匯入Google用.csv
+
+# 給廠商離線審閱的單檔預覽（build 產物，由 tools/build-preview.py 重生）
+preview/
