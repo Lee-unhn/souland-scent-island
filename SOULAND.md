@@ -3,7 +3,40 @@
 > 台灣第一個香氛產業年度展覽平台官網（招商 + 線上報名 + 金流 + Google Sheet 回寫）。
 > 2026.10.30 – 11.01 · 台北華山1914文創園區 東2館 ABCD。
 > 共同主辦：六赫茲 The Hex。
-> 建立日：2026-06-16　·　狀態：MVP 本機可跑版 ✅
+> 建立日：2026-06-16　·　狀態：⛔ **2026-09-11 Lee 決定關閉網站**（見下方 §關閉）
+
+---
+
+## ⛔ 關閉（2026-09-11，Lee 決定）
+
+**決定**：停用 GitHub Pages ＋ 關閉 Netlify 舊站。站體程式碼與 `gh-pages` 分支完整保留，不刪 repo。
+
+### 關閉前快照（恢復時照這個設回去）
+
+| 項目 | 關閉前的值 |
+|---|---|
+| 正式站主機 | **GitHub Pages**（2026-08 前由 Netlify 搬來；本檔下方 §3.5⑧/§6 寫的 Netlify 已過時） |
+| Pages 來源 | `gh-pages` 分支 `/`（root），build_type `legacy` |
+| Pages 最後部署 | `gh-pages` @ `9538fde`（2026-08-22「全站移除 PAPILLON DOUX」）＝ `main` @ `77a7226` 的 `public/` |
+| 自訂網域 | `soullandtw.com`（`public/CNAME`），HTTPS 憑證 approved、效期至 2026-11-16，`https_enforced=false` |
+| 網域驗證 | **未驗證**（`protected_domain_state=null`）→ 見下方「接管風險」 |
+| DNS（GoDaddy，NS=`ns29/ns30.domaincontrol.com`） | `A @ → 185.199.108.153`；`www CNAME → soullandtw.com` |
+| Netlify 舊站 | `souland2026.netlify.app` 關閉前仍 200 在線（內容停在 6 月） |
+| 後端 | Apps Script Web App（`config.js` `APPS_SCRIPT_URL`），**不隨網站關閉而停**；報名 Sheet／品牌／調香師／文案資料全在 Google Sheet，不受影響 |
+
+### 接管風險（順序很重要）
+
+網域在 GitHub **未驗證**。若先停 Pages、DNS 還指著 GitHub 的 IP，任何人都能在自己的 repo 放一個 `CNAME=soullandtw.com` 把網域接走（dangling DNS takeover）——對一個有「匯款繳攤位費」流程的展覽網域，最直接的濫用就是假報名頁＋假匯款帳號。
+**正確順序：先處理 GoDaddy DNS（刪 A 紀錄，或加 GitHub 網域驗證 TXT）→ 再停 Pages。**
+
+### 恢復步驟
+
+```bash
+gh api -X POST repos/Lee-unhn/souland-scent-island/pages -f "source[branch]=gh-pages" -f "source[path]=/"
+gh api -X PUT  repos/Lee-unhn/souland-scent-island/pages -f cname=soullandtw.com
+```
+
+GoDaddy 補回 `A @ → 185.199.108.153`（GitHub 建議四筆 `185.199.108~111.153` 都加）＋ `www CNAME → soullandtw.com`；等 HTTPS 憑證重新簽發（數分鐘到一小時）。
 
 ---
 
