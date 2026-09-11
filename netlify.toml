@@ -1,6 +1,9 @@
-# Netlify 部署設定 — 把 public/ 當作網站根目錄（直接服務多頁靜態站）
+# Netlify 部署設定
+# ⛔ 2026-09-11 關站：發佈目錄改指 netlify-closed/（只有空白 index.html / 404.html），
+#    任何網址都顯示空白頁。原站原始碼仍在 public/ 未動。
+#    恢復 = 把下一行改回 publish = "public"（或 revert 這個 commit）後 push main。
 [build]
-  publish = "public"
+  publish = "netlify-closed"
   command = ""
 
 # 永遠拿最新的 html/js/css（避免瀏覽器拿到舊版造成「連線錯誤」或舊字級/樣式殘留）
