@@ -9,7 +9,13 @@
 
 ## ⛔ 關閉（2026-09-11，Lee 決定）
 
-**決定**：停用 GitHub Pages ＋ 關閉 Netlify 舊站。站體程式碼與 `gh-pages` 分支完整保留，不刪 repo。
+**決定**：原始網址不可再看到網站內容；Netlify 舊站一起關。站體程式碼與 git 歷史完整保留，不刪 repo。
+
+**實際執行（2026-09-11）**：原選「停用 Pages」，因下方接管風險且 Lee 不操作 GoDaddy，改為 **Pages 保持啟用、`gh-pages` 內容換成空白頁**（Lee 同回合改口「連到一個空白網頁」）。
+- `gh-pages` @ `75aef27`：只剩 `CNAME`＋空白 `index.html`＋空白 `404.html`（任何舊路徑如 `/vendor.html`、`/admin.html` 書籤一律空白頁）。
+- 網域繼續綁定本 repo → **不存在接管空窗**，GoDaddy DNS 不必動。
+- **Netlify 舊站 `souland2026.netlify.app` 仍在線**（Lee 的 Netlify 面板才能刪：Site configuration → General → Danger zone → Delete this site）。它的 `config.js` 指向同一支 Apps Script，**從那裡送出的報名仍會寫進報名 Sheet**。
+- Apps Script 後端未動。
 
 ### 關閉前快照（恢復時照這個設回去）
 
@@ -29,14 +35,27 @@
 網域在 GitHub **未驗證**。若先停 Pages、DNS 還指著 GitHub 的 IP，任何人都能在自己的 repo 放一個 `CNAME=soullandtw.com` 把網域接走（dangling DNS takeover）——對一個有「匯款繳攤位費」流程的展覽網域，最直接的濫用就是假報名頁＋假匯款帳號。
 **正確順序：先處理 GoDaddy DNS（刪 A 紀錄，或加 GitHub 網域驗證 TXT）→ 再停 Pages。**
 
-### 恢復步驟
+### 恢復步驟（目前的關法：空白頁）
+
+把關閉 commit 反轉即可，一般 fast-forward push，**不需要 force**：
+
+```bash
+cd "C:/dev/桌面專案/嗅覺島-souland" && git fetch origin && git worktree add --detach ../_ghp origin/gh-pages
+cd ../_ghp && git revert --no-edit 75aef27 && git push origin HEAD:gh-pages && cd - && git worktree remove ../_ghp
+```
+
+Pages 約 1 分鐘重建、CDN 快取最長 10 分鐘。DNS／憑證都沒動過，不用重設。
+
+### 若日後仍要「完全停用 Pages」
+
+**先**到 GoDaddy 刪 `A @ 185.199.108.153` 與 `CNAME www`（或先做 GitHub 網域驗證），**再**跑 `gh api -X DELETE repos/Lee-unhn/souland-scent-island/pages`。順序反過來就會出現接管空窗。恢復則是：
 
 ```bash
 gh api -X POST repos/Lee-unhn/souland-scent-island/pages -f "source[branch]=gh-pages" -f "source[path]=/"
 gh api -X PUT  repos/Lee-unhn/souland-scent-island/pages -f cname=soullandtw.com
 ```
 
-GoDaddy 補回 `A @ → 185.199.108.153`（GitHub 建議四筆 `185.199.108~111.153` 都加）＋ `www CNAME → soullandtw.com`；等 HTTPS 憑證重新簽發（數分鐘到一小時）。
+加回 DNS（GitHub 建議 `A @ → 185.199.108~111.153` 四筆＋`www CNAME → soullandtw.com`），等 HTTPS 憑證重簽。
 
 ---
 
