@@ -14,8 +14,9 @@
 **實際執行（2026-09-11）**：原選「停用 Pages」，因下方接管風險且 Lee 不操作 GoDaddy，改為 **Pages 保持啟用、`gh-pages` 內容換成空白頁**（Lee 同回合改口「連到一個空白網頁」）。
 - `gh-pages` @ `75aef27`：只剩 `CNAME`＋空白 `index.html`＋空白 `404.html`（任何舊路徑如 `/vendor.html`、`/admin.html` 書籤一律空白頁）。
 - 網域繼續綁定本 repo → **不存在接管空窗**，GoDaddy DNS 不必動。
-- **Netlify 舊站 `souland2026.netlify.app` 仍在線**（Lee 的 Netlify 面板才能刪：Site configuration → General → Danger zone → Delete this site）。它的 `config.js` 指向同一支 Apps Script，**從那裡送出的報名仍會寫進報名 Sheet**。
-- Apps Script 後端未動。
+- **Netlify 舊站 `souland2026.netlify.app` 也改空白頁**：比對發現它仍連著本 repo、自動部署 `main`（線上內容＝`77a7226`＋Netlify 自己插的註解與網址改寫）。故於 `main` @ `33810c9` 把 `netlify.toml` 的 `publish` 從 `public` 改指 `netlify-closed/`（只有空白 `index.html`／`404.html`），Netlify 任何網址都是空白頁，**它的報名表單也一起下線**。`public/` 原始碼未動。
+- ⚠️ 從此 **`main` 上的 `netlify.toml` 是關站狀態**。日後任何人 push `main` 都不會讓 Netlify 復活；要恢復 Netlify 必須明確 revert `33810c9`。
+- Apps Script 後端未動。（Netlify 站若日後要徹底刪除仍需 Lee 面板操作，但已非必要。）
 
 ### 關閉前快照（恢復時照這個設回去）
 
@@ -45,6 +46,8 @@ cd ../_ghp && git revert --no-edit 75aef27 && git push origin HEAD:gh-pages && c
 ```
 
 Pages 約 1 分鐘重建、CDN 快取最長 10 分鐘。DNS／憑證都沒動過，不用重設。
+
+Netlify 舊站（若也要恢復）：在 `main` 上 `git revert --no-edit 33810c9` 後 push `main`，Netlify 自動重新部署 `public/`。
 
 ### 若日後仍要「完全停用 Pages」
 
