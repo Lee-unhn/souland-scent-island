@@ -12,6 +12,7 @@ const express = require('express');
 const crypto  = require('crypto');
 const path    = require('path');
 const fs      = require('fs');
+const { createAdminAuth } = require('./admin-auth');
 
 // —— .env (簡易載入，無外部依賴) ——
 const envPath = path.join(__dirname, '.env');
@@ -209,42 +210,27 @@ app.post('/api/payment/notify', (req, res) => {
 /* ============================================================
    Admin 後台：帳密登入 + 參展廠商(品牌) CRUD
    ============================================================ */
-const ADMIN_USER   = process.env.ADMIN_USER   || 'admin';
-const ADMIN_PASS   = process.env.ADMIN_PASS   || 'souland2026';
-const ADMIN_SECRET = process.env.ADMIN_SECRET || 'souland-scent-island-secret-change-me';
+// 帳密只從 server/.env 讀（ADMIN_USER / ADMIN_PASS / ADMIN_SECRET），沒設就關閉後台
+const adminAuth = createAdminAuth(process.env);
 const BRANDS_DB = path.join(__dirname, 'brands.json');
 const loadBrands = () => fs.existsSync(BRANDS_DB) ? JSON.parse(fs.readFileSync(BRANDS_DB, 'utf8')) : [];
 const saveBrands = (a) => fs.writeFileSync(BRANDS_DB, JSON.stringify(a, null, 2));
 
-// 無狀態簽章 token：base64url(user).exp.HMAC
-function signToken(user, ttlMs = 8 * 3600 * 1000) {
-  const exp = Date.now() + ttlMs;
-  const head = Buffer.from(user).toString('base64url') + '.' + exp;
-  const sig = crypto.createHmac('sha256', ADMIN_SECRET).update(head).digest('base64url');
-  return head + '.' + sig;
-}
-function verifyToken(token) {
-  if (!token) return null;
-  const parts = token.split('.');
-  if (parts.length !== 3) return null;
-  const head = parts[0] + '.' + parts[1];
-  const sig = crypto.createHmac('sha256', ADMIN_SECRET).update(head).digest('base64url');
-  if (sig !== parts[2]) return null;
-  if (Date.now() > Number(parts[1])) return null;
-  return Buffer.from(parts[0], 'base64url').toString();
-}
 function requireAdmin(req, res, next) {
   const auth = req.headers.authorization || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : (req.query.token || '');
-  const user = verifyToken(token);
+  const user = adminAuth.verifyToken(token);
   if (!user) return res.status(401).json({ ok: false, error: '未授權或登入逾時' });
   req.adminUser = user; next();
 }
 
 app.post('/api/admin/login', (req, res) => {
+  if (!adminAuth.enabled) {
+    return res.status(503).json({ ok: false, error: '後台未啟用：請在 server/.env 設定 ADMIN_USER 與 ADMIN_PASS' });
+  }
   const { username, password } = req.body || {};
-  if (username === ADMIN_USER && password === ADMIN_PASS) {
-    return res.json({ ok: true, token: signToken(username), user: username });
+  if (adminAuth.checkLogin(username, password)) {
+    return res.json({ ok: true, token: adminAuth.signToken(username), user: username });
   }
   res.status(401).json({ ok: false, error: '帳號或密碼錯誤' });
 });
@@ -331,5 +317,6 @@ app.get('/api/health', (req, res) => res.json({
 app.listen(PORT, () => {
   console.log(`\n  嗅覺島 SOULAND  ▸  http://localhost:${PORT}`);
   console.log(`  ECPay: ${ECPAY.MerchantID === '2000132' ? '測試 STAGE (2000132)' : '正式 ' + ECPAY.MerchantID}`);
-  console.log(`  Sheet: ${SHEET_WEBHOOK ? 'webhook 已設定' : '未設定 webhook（僅存 registrations.json）'}\n`);
+  console.log(`  Sheet: ${SHEET_WEBHOOK ? 'webhook 已設定' : '未設定 webhook（僅存 registrations.json）'}`);
+  console.log(`  後台: ${adminAuth.enabled ? '已啟用' : '未啟用（server/.env 未設 ADMIN_USER / ADMIN_PASS）'}${adminAuth.enabled && !adminAuth.secretFromEnv ? '，ADMIN_SECRET 未設：重啟後需重新登入' : ''}\n`);
 });

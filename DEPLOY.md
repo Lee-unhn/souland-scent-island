@@ -65,7 +65,7 @@ TICKET_URL: "",  // 開賣時填售票網址
 
 ## E. 安全注意
 
-- **務必修改後台預設密碼**：`Code.gs` 走 Script Properties 的 `ADMIN_PASS`（不是 repo 裡的 `souland2026`，那只是本機 Express 預設）。
+- **後台帳密沒有預設值**：`Code.gs` 走 Script Properties 的 `ADMIN_USER`／`ADMIN_PASS`；本機 Express 走 `server/.env`，沒設就關閉後台。
 - 報名資料 Sheet（含申請人個資）的 **ID 不放進 repo**（只放 Apps Script 指令碼屬性）。
 - `.env` / `registrations.json` 已被 `.gitignore` 排除，不會上傳。
 

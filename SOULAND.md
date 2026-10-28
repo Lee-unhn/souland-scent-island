@@ -77,7 +77,7 @@ npm start            # → http://localhost:3000
 - 首頁 `http://localhost:3000/`（多頁：首頁/關於/展覽資訊/特色體驗/參展品牌/年度大賞/B2B・媒體/聯絡我們）
 - 報名頁 `http://localhost:3000/vendor.html`（六大效益/四方案/費用試算/申請表）
 - 報名完成頁 `http://localhost:3000/thank-you.html`（**招商簡章 PDF 下載** + 匯款備註）
-- **參展廠商後台 `http://localhost:3000/admin.html`（帳密登入，預設 `admin` / `souland2026`）**
+- **參展廠商後台 `http://localhost:3000/admin.html`（帳密登入，帳密在 `server/.env` 的 `ADMIN_USER`／`ADMIN_PASS`，沒設＝後台關閉）**
 - 健康檢查 `http://localhost:3000/api/health`、本機報名查詢 `/api/registrations`
 
 > 預設使用**綠界公開測試特店 2000132（STAGE）**，可端對端跑通付款且**不會真實扣款**。
@@ -148,7 +148,7 @@ npm start            # → http://localhost:3000
 
 **③ Google Sheet（資料庫）**：三張 Sheet（報名資料 / 參展品牌 / 工作坊候補）建於主辦 Google Drive。**Sheet ID 不放進此 repo**（含申請人個資的報名表尤其敏感），改放 Apps Script 的「指令碼屬性 Script Properties」（`SHEET_REG` / `SHEET_BRANDS` / `SHEET_WS`）。部署步驟見 [DEPLOY.md](DEPLOY.md)。
 
-**④ Admin 後台 `/admin.html`**（給操作人員）：帳密登入（預設 `admin`/`souland2026`，改 `server/.env` 的 `ADMIN_USER`/`ADMIN_PASS`/`ADMIN_SECRET`）→ 新增/編輯/刪除**參展廠商**（品牌名、英文名、類型、產地、攤位、香調前中後、品牌故事、產品推薦多筆、logo、是否公開）。資料存 `server/brands.json`，已發布者由公開 `/api/brands` 提供，官網「參展品牌」頁即時讀取顯示（取代原 placeholder）。
+**④ Admin 後台 `/admin.html`**（給操作人員）：帳密登入（無預設值，設在 `server/.env` 的 `ADMIN_USER`/`ADMIN_PASS`/`ADMIN_SECRET`；帳密沒設＝後台關閉）→ 新增/編輯/刪除**參展廠商**（品牌名、英文名、類型、產地、攤位、香調前中後、品牌故事、產品推薦多筆、logo、是否公開）。資料存 `server/brands.json`，已發布者由公開 `/api/brands` 提供，官網「參展品牌」頁即時讀取顯示（取代原 placeholder）。
 後端：`POST /api/admin/login`（回簽章 token，8 小時效期）＋ `GET/POST/PUT/DELETE /api/admin/brands`（Bearer 驗證）＋ 公開 `GET /api/brands`。
 
 **⑤ 全站文字覆蓋（L3b，2026-06-16）**：用一張「文案」Google Sheet（欄位＝頁面／原文／新文字）做「**原文 → 新文字**」對照表。前台 `config.js` 的 `SOULAND_TEXT.apply()` 在頁面載入後讀後端 `textGet`，把畫面上**整段等於「原文」**的文字替換成「新文字」；沒填的維持原文（不影響載入速度，後台 admin 不套用）。
@@ -236,4 +236,4 @@ npm start            # → http://localhost:3000
 
 ## 歷史沿革（2026-07-03 自專案總覽搬入，逐字保留）
 
-台灣第一個香氛產業年度展覽「嗅覺島」招商報名官網（2026/10/30–11/01 華山1914 四連棟，六赫茲 The Hex 共同主辦）。**2026-06-16 依使用者 demo（`Downloads/souland-website-v1`）改為多頁設計**（首頁/關於/展覽資訊/特色體驗/參展品牌目錄+詳情/年度大賞/B2B媒體/聯絡我們 + vendor.html 報名 + thank-you.html）。**報名完成頁提供招商簡章 PDF 下載**（使用者要求）。**繳費＝報名後匯款**（2026-06-16 使用者決定關閉線上金流，網頁兩處顯示匯款備註、文字走 config.js REMITTANCE.NOTE）；綠界 ECPay 整套程式碼保留（後端 /api/payment/ecpay + /Cashier/AioCheckOut/V5 + 測試特店 2000132，CheckMacValue 與官方 SDK 逐位元相符），`PAYMENT.ENABLED` 改 true 即可恢復；**報名回寫 Google Sheet 走 Apps Script webhook**（已備 `apps-script/Code.gs`，等使用者貼 `/exec` URL）。前端靜態多頁 + Express(server.js) 後端，`npm start` 即跑。設計＝霧藍島嶼×牛皮紙（demo 真實 logo PNG）。舊單頁版留 `public/_legacy_singlepage/`。**2026-06-16 依客戶 `報名表.docx` 對齊完整欄位+早鳥/一般雙價；用 Drive MCP 在客戶 Google 建好報名 Sheet（ID 1w-x36…）並接 Code.gs；新增 `/admin.html` 參展廠商後台（帳密 admin/souland2026、HMAC token、品牌 CRUD 存 brands.json、公開 /api/brands 餵參展品牌頁）。主辦六赫茲股份有限公司｜亞洲香研所、Soulland@soullandtw.com**。**2026-06-17 上線＋大批升級**：後端改 Apps Script（全 JSONP，解 Safari）；英文名 **SOUL LAND**（網域/email 維持 soulland）；攤位**改一次付清**（3×3 35,000/2×2 28,000/供應鏈 30,000/市集 6,000）；新增**媒體夥伴**區、**Meta Pixel**、**調香師專區（獨立頁＋後台 CRUD，SHEET_PERFUMERS）**、**L3b 全站文字後台可改（文案 Sheet）**、**版面 L1/L2 延伸到首頁＋各獨立頁**（後台分頁切換排序/隱藏）；GitHub→Netlify 部署、GoDaddy 網域 soullandtw.com＋SSL；GitHub Pages 搬遷備而未用（Netlify 點數警告）。PM：L1 chief-of-staff／L2 project-shepherd。非八拍案
+台灣第一個香氛產業年度展覽「嗅覺島」招商報名官網（2026/10/30–11/01 華山1914 四連棟，六赫茲 The Hex 共同主辦）。**2026-06-16 依使用者 demo（`Downloads/souland-website-v1`）改為多頁設計**（首頁/關於/展覽資訊/特色體驗/參展品牌目錄+詳情/年度大賞/B2B媒體/聯絡我們 + vendor.html 報名 + thank-you.html）。**報名完成頁提供招商簡章 PDF 下載**（使用者要求）。**繳費＝報名後匯款**（2026-06-16 使用者決定關閉線上金流，網頁兩處顯示匯款備註、文字走 config.js REMITTANCE.NOTE）；綠界 ECPay 整套程式碼保留（後端 /api/payment/ecpay + /Cashier/AioCheckOut/V5 + 測試特店 2000132，CheckMacValue 與官方 SDK 逐位元相符），`PAYMENT.ENABLED` 改 true 即可恢復；**報名回寫 Google Sheet 走 Apps Script webhook**（已備 `apps-script/Code.gs`，等使用者貼 `/exec` URL）。前端靜態多頁 + Express(server.js) 後端，`npm start` 即跑。設計＝霧藍島嶼×牛皮紙（demo 真實 logo PNG）。舊單頁版留 `public/_legacy_singlepage/`。**2026-06-16 依客戶 `報名表.docx` 對齊完整欄位+早鳥/一般雙價；用 Drive MCP 在客戶 Google 建好報名 Sheet（ID 1w-x36…）並接 Code.gs；新增 `/admin.html` 參展廠商後台（帳密設在 server/.env、HMAC token、品牌 CRUD 存 brands.json、公開 /api/brands 餵參展品牌頁）。主辦六赫茲股份有限公司｜亞洲香研所、Soulland@soullandtw.com**。**2026-06-17 上線＋大批升級**：後端改 Apps Script（全 JSONP，解 Safari）；英文名 **SOUL LAND**（網域/email 維持 soulland）；攤位**改一次付清**（3×3 35,000/2×2 28,000/供應鏈 30,000/市集 6,000）；新增**媒體夥伴**區、**Meta Pixel**、**調香師專區（獨立頁＋後台 CRUD，SHEET_PERFUMERS）**、**L3b 全站文字後台可改（文案 Sheet）**、**版面 L1/L2 延伸到首頁＋各獨立頁**（後台分頁切換排序/隱藏）；GitHub→Netlify 部署、GoDaddy 網域 soullandtw.com＋SSL；GitHub Pages 搬遷備而未用（Netlify 點數警告）。PM：L1 chief-of-staff／L2 project-shepherd。非八拍案

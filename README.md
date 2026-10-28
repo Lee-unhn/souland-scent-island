@@ -18,7 +18,7 @@ npm start        # http://localhost:3000
 │  ├─ index.html            SPA 路由：首頁/關於/展覽資訊/特色體驗/參展品牌/年度大賞/B2B・媒體/聯絡我們
 │  ├─ vendor.html           我要參展：六大效益 · 四方案 · 申請流程 · 費用試算 · 申請表
 │  ├─ thank-you.html        報名完成：招商簡章 PDF 下載 + 匯款備註
-│  ├─ admin.html / admin.js 參展廠商後台（帳密登入 + 品牌 CRUD，預設 admin/souland2026）
+│  ├─ admin.html / admin.js 參展廠商後台（帳密登入 + 品牌 CRUD，帳密設在 server/.env）
 │  ├─ payment-complete.html 綠界付款結果（金流停用中，程式保留）
 │  ├─ styles.css · app.js · vendor.js · config.js（全站設定改這支）
 │  ├─ assets/ (logo PNG light/dark · poster.jpg · souland-prospectus.pdf 招商簡章)
